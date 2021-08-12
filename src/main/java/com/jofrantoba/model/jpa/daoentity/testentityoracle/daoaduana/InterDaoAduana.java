@@ -11,6 +11,6 @@ import com.jofrantoba.model.jpa.daoentity.InterCrud;
  *
  * @author jona
  */
-public interface InterDaoAduana extends InterCrud{
+public interface InterDaoAduana extends InterCrud<Aduana>{
     
 }
