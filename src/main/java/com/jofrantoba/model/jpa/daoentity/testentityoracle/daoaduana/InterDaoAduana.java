@@ -5,10 +5,12 @@
  */
 package com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana;
 
+import com.jofrantoba.model.jpa.daoentity.InterCrud;
+
 /**
  *
  * @author jona
  */
-public interface InterDaoAduana {
+public interface InterDaoAduana extends InterCrud{
     
 }

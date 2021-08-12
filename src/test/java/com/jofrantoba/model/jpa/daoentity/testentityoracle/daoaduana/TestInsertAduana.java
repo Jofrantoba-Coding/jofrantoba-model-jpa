@@ -8,6 +8,8 @@ package com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana;
 import com.jofrantoba.model.jpa.daoentity.testentityoracle.TestAbstract;
 import com.jofrantoba.model.jpa.psf.PSF;
 import com.jofrantoba.model.jpa.shared.UnknownException;
+import java.util.Date;
+import java.util.UUID;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,11 @@ public class TestInsertAduana extends TestAbstract{
     @Test
     void createEntity1() throws UnknownException {        
         Aduana entity = new Aduana();
-        entity.setId("1010");
-        entity.setDescripcion("ACTIVO");        
+        UUID uuid = UUID.randomUUID(); 
+        entity.setId("123");
+        entity.setDescripcion("ACTIVO");
+        entity.setEstado("A");
+        entity.setDateCrea(new Date());        
         DaoAduana dao = new DaoAduana();
         SessionFactory sesionFactory=PSF.getClassPSF().getPSFStatic();
         dao.setSessionFactory(sesionFactory);

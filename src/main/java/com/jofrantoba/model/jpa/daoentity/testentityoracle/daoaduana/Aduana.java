@@ -6,10 +6,13 @@
 package com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
@@ -27,9 +30,9 @@ public class Aduana implements Serializable{
     @Id    
     @Column(name = "ID_ADUANA")  
     private String id;
-    @Column(name = "DESCRPCION")
+    @Column(name = "DESCRIPCION")
     private String descripcion;
-    /*@Column(name = "\"_USER_CREA\"")
+    @Column(name = "\"_USER_CREA\"")
     private String userCrea;
     @Column(name = "\"_USER_UPDATE\"")
     private String userUpdate;
@@ -40,5 +43,5 @@ public class Aduana implements Serializable{
     @Temporal(TemporalType.DATE)
     private Date dateUpdate;
     @Column(name = "\"_ESTADO\"")
-    private String estado;*/
+    private String estado;
 }
