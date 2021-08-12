@@ -32,16 +32,16 @@ public class Aduana implements Serializable{
     private String id;
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    @Column(name = "\"_USER_CREA\"")
+    @Column(name = "USER_CREA")
     private String userCrea;
-    @Column(name = "\"_USER_UPDATE\"")
+    @Column(name = "USER_UPDATE")
     private String userUpdate;
-    @Column(name = "\"_DATE_CREA\"")
+    @Column(name = "DATE_CREA")
     @Temporal(TemporalType.DATE)
     private Date dateCrea;
-    @Column(name = "\"_DATE_UPDATE\"")
+    @Column(name = "DATE_UPDATE")
     @Temporal(TemporalType.DATE)
     private Date dateUpdate;
-    @Column(name = "\"_ESTADO\"")
+    @Column(name = "ESTADO")
     private String estado;
 }

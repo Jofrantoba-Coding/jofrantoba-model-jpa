@@ -19,11 +19,11 @@ import org.junit.jupiter.api.Test;
  * @author jona
  */
 public class TestInsertAduana extends TestAbstract{
-    @Test
+    @Test                
     void createEntity1() throws UnknownException {        
         Aduana entity = new Aduana();
         UUID uuid = UUID.randomUUID(); 
-        entity.setId("123");
+        entity.setId(uuid.toString());
         entity.setDescripcion("ACTIVO");
         entity.setEstado("A");
         entity.setDateCrea(new Date());        
