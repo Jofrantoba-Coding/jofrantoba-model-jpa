@@ -24,3 +24,8 @@ hs_err_pid*
 
 # folders
 target/
+
+.classpath
+.factorypath
+.project
+.settings/
