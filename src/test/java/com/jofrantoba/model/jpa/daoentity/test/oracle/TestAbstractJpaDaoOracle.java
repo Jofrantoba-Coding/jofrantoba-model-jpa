@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jofrantoba.model.jpa.daoentity.testentityoracle;
+package com.jofrantoba.model.jpa.daoentity.test.oracle;
 
+import com.jofrantoba.model.jpa.daoentity.test.TestAbstract;
 import com.jofrantoba.model.jpa.psf.PSF;
 import java.sql.Connection;
 import java.sql.SQLException;

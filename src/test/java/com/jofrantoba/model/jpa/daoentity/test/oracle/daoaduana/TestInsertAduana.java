@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana;
+package com.jofrantoba.model.jpa.daoentity.test.oracle.daoaduana;
 
-import com.jofrantoba.model.jpa.daoentity.testentityoracle.TestAbstract;
+import com.jofrantoba.model.jpa.daoentity.test.TestAbstract;
 import com.jofrantoba.model.jpa.psf.PSF;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Date;

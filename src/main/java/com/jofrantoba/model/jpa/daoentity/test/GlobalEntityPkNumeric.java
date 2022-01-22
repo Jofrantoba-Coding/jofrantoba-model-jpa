@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jofrantoba.model.jpa.daoentity.testentityoracle;
+package com.jofrantoba.model.jpa.daoentity.test;
 
 import java.io.Serializable;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
@@ -22,6 +24,7 @@ import lombok.extern.log4j.Log4j2;
 @MappedSuperclass
 public abstract class GlobalEntityPkNumeric implements Serializable{
     @Id    
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id")  
     private Long id;
     @Column(name = "version")

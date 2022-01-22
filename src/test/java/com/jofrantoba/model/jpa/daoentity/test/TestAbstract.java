@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jofrantoba.model.jpa.daoentity.testentityoracle;
+package com.jofrantoba.model.jpa.daoentity.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

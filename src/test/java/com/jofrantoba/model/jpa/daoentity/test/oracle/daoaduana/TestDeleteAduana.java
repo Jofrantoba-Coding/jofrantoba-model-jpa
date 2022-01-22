@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana;
+package com.jofrantoba.model.jpa.daoentity.test.oracle.daoaduana;
 
 /**
  *

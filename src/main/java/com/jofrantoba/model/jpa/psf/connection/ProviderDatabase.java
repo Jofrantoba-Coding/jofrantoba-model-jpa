@@ -13,7 +13,7 @@ public enum ProviderDatabase {
     MONGO("MongoDb",""),
     ORACLE("Oracle","oracle.jdbc.driver.OracleDriver"),
     POSTGRES("Postgres",""),
-    MYSQL("MySql","com.mysql.jdbc.Driver"),
+    MYSQL("MySql","com.mysql.cj.jdbc.Driver"),
     SQLSERVER("SqlServer","com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     HYPERSQL("HyperSql","org.hsqldb.jdbc.JDBCDriver");
     

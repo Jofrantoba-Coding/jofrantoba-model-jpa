@@ -5,7 +5,7 @@
  */
 package com.jofrantoba.model.jpa.psf;
 
-import com.jofrantoba.model.jpa.daoentity.testentityoracle.daoaduana.Aduana;
+import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesMysql;
 import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesOracle;
 import java.util.HashMap;
 import java.util.Properties;
@@ -22,7 +22,8 @@ import org.reflections.Reflections;
  */
 public class PSF {
 
-    private static final ConnectionPropertiesOracle propsStatic = new ConnectionPropertiesOracle("192.168.1.4", 1521, "orcl", "sysdecorprueba", "sysdecorprueba");
+    //private static final ConnectionPropertiesOracle propsStatic = new ConnectionPropertiesOracle("192.168.1.4", 1521, "orcl", "sysdecorprueba", "sysdecorprueba");
+    private static final ConnectionPropertiesMysql propsStatic = new ConnectionPropertiesMysql("192.168.1.10", 3306, "parameta", "jofrantoba", "F1l0s0f0");
     private static final PSF psf = new PSF();
     private final HashMap<String, SessionFactory> mapPSF = new HashMap();
     private static final String SCHEMASTATIC = "database";
@@ -35,7 +36,7 @@ public class PSF {
         return mapPSF.get(SCHEMASTATIC);
     }
 
-    public void destroyPMFStatic() {
+    public void destroyPSFStatic() {
         if (mapPSF.get(SCHEMASTATIC) != null) {
             mapPSF.get(SCHEMASTATIC).close();
             mapPSF.remove(SCHEMASTATIC);
@@ -53,7 +54,8 @@ public class PSF {
             cfg.setProperties(props);
             //cfg.addAnnotatedClass(Aduana.class);
             //cfg.addPackage("com.jofrantoba.model.jpa.daoentity");
-            Reflections reflections = new Reflections("com.jofrantoba.model.jpa.daoentity");
+            //Reflections reflections = new Reflections("com.jofrantoba.model.jpa.daoentity");
+            Reflections reflections = new Reflections("com.parameter.entity");
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
             for (Class<?> clazz : classes) {
                 cfg.addAnnotatedClass(clazz);
@@ -65,7 +67,7 @@ public class PSF {
         return mapPSF.get(publickey);
     }
 
-    public SessionFactory getPMF(String publickey) {
+    public SessionFactory getPSF(String publickey) {
         return mapPSF.get(publickey);
     }
 
