@@ -22,8 +22,8 @@ import org.reflections.Reflections;
  */
 public class PSF {
 
-    //private static final ConnectionPropertiesOracle propsStatic = new ConnectionPropertiesOracle("192.168.1.4", 1521, "orcl", "sysdecorprueba", "sysdecorprueba");
-    private static final ConnectionPropertiesMysql propsStatic = new ConnectionPropertiesMysql("192.168.1.10", 3306, "parameta", "jofrantoba", "F1l0s0f0");
+    //private static final ConnectionPropertiesOracle propsStatic = new ConnectionPropertiesOracle("172.16.1.4", 1521, "orcl", "user", "pass");
+    private static final ConnectionPropertiesMysql propsStatic = new ConnectionPropertiesMysql("172.16.1.10", 3306, "schema", "user", "pass");
     private static final PSF psf = new PSF();
     private final HashMap<String, SessionFactory> mapPSF = new HashMap();
     private static final String SCHEMASTATIC = "database";

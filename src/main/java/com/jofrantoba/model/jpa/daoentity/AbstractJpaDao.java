@@ -370,6 +370,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             case "isnotnull":
                 pre = build.isNotNull(root.get(mapFilterField.split(":")[1]));
                 break;
+            case "istrue":
+                pre = build.isTrue(root.get(mapFilterField.split(":")[1]));
+                break;
+            case "isfalse":
+                pre = build.isFalse(root.get(mapFilterField.split(":")[1]));
+                break;
             case "equal":
                 pre = build.equal(root.get(mapFilterField.split(":")[1]), mapFilterField.split(":")[2]);
                 break;
