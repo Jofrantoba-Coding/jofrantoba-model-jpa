@@ -21,7 +21,7 @@ import org.junit.Test;
 @Log4j2
 public class TestAbstractJpaDaoOracle extends TestAbstract {
     
-    @Test
+    /*@Test
     public void testOracleConnection() {        
         Session ss = PSF.getClassPSF().getPSFStatic().getCurrentSession();
         ss.beginTransaction();
@@ -31,6 +31,6 @@ public class TestAbstractJpaDaoOracle extends TestAbstract {
                 log.info("Servidor:{} ", connection.getMetaData().getDatabaseProductVersion());                
             }
         });        
-    }
+    }*/
     
 }

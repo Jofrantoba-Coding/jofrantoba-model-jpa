@@ -24,7 +24,7 @@ import lombok.extern.log4j.Log4j2;
 @EqualsAndHashCode(callSuper=false)
 @Data
 @Entity
-@Table(catalog="parameta",schema="parameta",name = "empleado")
+@Table(catalog="demotiktok",schema="demotiktok",name = "empleado")
 public class Empleado extends GlobalEntityPkNumeric implements Serializable{
     @Column(name = "nombres")
     private String nombres;

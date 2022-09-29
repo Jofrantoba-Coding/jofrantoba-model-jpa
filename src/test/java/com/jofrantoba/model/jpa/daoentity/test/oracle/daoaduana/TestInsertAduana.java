@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  * @author jona
  */
 public class TestInsertAduana extends TestAbstract{
-    @Test                
+    /*@Test                
     void createEntity1() throws UnknownException {        
         Aduana entity = new Aduana();
         UUID uuid = UUID.randomUUID(); 
@@ -33,5 +33,5 @@ public class TestInsertAduana extends TestAbstract{
         Transaction tx=sesionFactory.getCurrentSession().beginTransaction();
         dao.save(entity);
         tx.commit();
-    }
+    }*/
 }
