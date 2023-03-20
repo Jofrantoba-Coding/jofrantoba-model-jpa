@@ -10,9 +10,8 @@ package com.jofrantoba.model.jpa.psf.connection;
  * @author jona
  */
 public enum ProviderDatabase {
-    MONGO("MongoDb",""),
     ORACLE("Oracle","oracle.jdbc.driver.OracleDriver"),
-    POSTGRES("Postgres",""),
+    POSTGRES("Postgres","org.postgresql.Driver"),
     MYSQL("MySql","com.mysql.cj.jdbc.Driver"),
     SQLSERVER("SqlServer","com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     HYPERSQL("HyperSql","org.hsqldb.jdbc.JDBCDriver");
