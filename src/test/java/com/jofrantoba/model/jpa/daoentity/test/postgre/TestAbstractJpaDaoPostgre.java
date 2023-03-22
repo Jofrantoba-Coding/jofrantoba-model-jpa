@@ -43,7 +43,7 @@ public class TestAbstractJpaDaoPostgre extends TestAbstract {
     }
     
     private ConnectionPropertiesPostgre getCnx(){
-        ConnectionPropertiesPostgre cnx=new ConnectionPropertiesPostgre("localhost",5432,"postgres","postgres","jofrantoba");
+        ConnectionPropertiesPostgre cnx=new ConnectionPropertiesPostgre("localhost",5432,"icl","usercatastro","icl2023");
         return cnx;
     }
     

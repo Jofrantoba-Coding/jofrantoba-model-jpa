@@ -39,7 +39,8 @@ public class ConnectionPropertiesPostgre extends AbstractConnectionProperties{
         props.setProperty(Environment.PASS, super.getPasswordDatabase());                                    
         props.setProperty(Environment.DIALECT,"org.hibernate.dialect.PostgreSQLDialect");                 
         props.setProperty(Environment.SHOW_SQL,"true");                 
-        props.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS,"thread");   
+        props.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS,"thread");           
+        //props.setProperty("hibernate.type_contributors", "com.fasterxml.jackson.datatype.hibernate5.Hibernate5ModuleTypeContributor");
         props.setProperty("hibernate.connection.release_mode", "after_transaction");
         props.setProperty("hibernate.connection.useUnicode", "true");
         props.setProperty("hibernate.connection.charSet", "utf8mb4");
