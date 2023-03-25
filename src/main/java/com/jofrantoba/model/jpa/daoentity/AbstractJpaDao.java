@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -179,7 +180,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(Shared.append("where 1=1"));
         sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));                
-        sql.append(Shared.append("order by 1 asc"));
+        sql.append(Shared.append(orderStringSelect(mapOrder)));
         Query query = getCurrentSession().createQuery(sql.toString());        
         Collection<T> valores = query.list();
         return valores;
@@ -246,6 +247,18 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             }
             criteria.orderBy(orders);
         }
+    }
+    
+    private String orderStringSelect(String... mapOrder) {        
+        if (mapOrder != null && mapOrder.length > 0) {
+            StringJoiner joiner = new StringJoiner(", ");
+            for (int i = 0; i < mapOrder.length; i++) {
+                String[] order=mapOrder[i].split(":");
+                joiner.add(order[0]+" "+order[1]);
+            }
+            return "order by "+joiner.toString();
+        }
+        return "";
     }
 
     private void orderString(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root, String... mapOrder) {
