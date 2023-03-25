@@ -171,14 +171,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
-    public Collection<T> allFieldsFilterIdNumberRecursivo(String mapFilter, String[] mapOrder) throws UnknownException {
+    public Collection<T> allFieldsJoinFilter(String joinTable,String mapFilter, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
-        String[] filters = mapFilter.split(":");
-        String fieldParent = filters[1].split("\\.")[0];
-        sql.append(Shared.append("select hijo from"));
+        sql.append(Shared.append("select base from"));
         sql.append(clazz.getName());
-        sql.append(Shared.append("as hijo"));
-        sql.append(Shared.append("left join hijo." + fieldParent + " " + fieldParent));
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(Shared.append("where 1=1"));
         sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));                
         sql.append(Shared.append("order by 1 asc"));
