@@ -63,4 +63,6 @@ public interface InterCrud<T extends Serializable> {
     Collection<T> customFieldsFilterOr(String fields,String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
     Map<Integer, Object[]> sqlExportTOExcel(String sql)throws UnknownException;
+    
+    Collection<T> allFieldsFilterIdNumberRecursivo(String mapFilter,String[] mapOrder) throws UnknownException;
 }

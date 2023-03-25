@@ -42,6 +42,7 @@ import org.hibernate.query.Query;
 @Log4j2
 @Data
 public abstract class AbstractJpaDao<T extends Serializable> implements InterCrud<T> {
+
     private Class<T> clazz;
 
     private SessionFactory sessionFactory;
@@ -170,6 +171,23 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
+    public Collection<T> allFieldsFilterIdNumberRecursivo(String mapFilter, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        String[] filters = mapFilter.split(":");
+        String fieldParent = filters[1].split("\\.")[0];
+        sql.append(Shared.append("select hijo from"));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as hijo"));
+        sql.append(Shared.append("left join hijo." + fieldParent + " " + fieldParent));
+        sql.append(Shared.append("where 1=1"));
+        sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));                
+        sql.append(Shared.append("order by 1 asc"));
+        Query query = getCurrentSession().createQuery(sql.toString());        
+        Collection<T> valores = query.list();
+        return valores;
+    }
+
+    @Override
     public Collection<T> allFieldsFilterAnd(String[] mapFilterField, String[] mapOrder) throws UnknownException {
         CriteriaBuilder build = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<T> criteria = build.createQuery(clazz);
@@ -202,14 +220,14 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
 
     private StringBuilder buildFilterString(String conectorLogico, String[] mapFilterField) {
         StringBuilder filter = new StringBuilder();
-        if(mapFilterField.length>0){
-        filter.append(Shared.append("where 1=1"));        
-         for (int i = 0; i < mapFilterField.length; i++) {
-            filter.append(Shared.append(conectorLogico)).append(Shared.append(filterString(mapFilterField[i]).toString()));
-            return filter;
-        }   
-        }else{
-            filter.append(Shared.append("where 1=2"));        
+        if (mapFilterField.length > 0) {
+            filter.append(Shared.append("where 1=1"));
+            for (int i = 0; i < mapFilterField.length; i++) {
+                filter.append(Shared.append(conectorLogico)).append(Shared.append(filterString(mapFilterField[i]).toString()));
+                return filter;
+            }
+        } else {
+            filter.append(Shared.append("where 1=2"));
         }
         return filter;
     }
@@ -262,6 +280,73 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             }
         }
         return order;
+    }        
+    
+    private StringBuilder filterStringSelect(String mapFilterField) {
+        StringBuilder pre = new StringBuilder();
+        switch (mapFilterField.split(":")[0]) {
+            case ">":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append(">"));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "<":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("<"));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case ">=":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append(">="));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "<=":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("<="));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "=":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("="));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "!=":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("!="));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "like":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("like"));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                break;
+            case "between":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("between"));
+                pre.append(Shared.append(mapFilterField.split(":")[2]));
+                pre.append(Shared.append("and"));
+                pre.append(Shared.append(mapFilterField.split(":")[3]));
+                break;
+            case "in":
+                String valuesIn = "";
+                for (int i = 2; i < mapFilterField.split(":").length; i++) {
+                    valuesIn = valuesIn + mapFilterField.split(":")[i];
+                }
+                pre.append(Shared.append("in"));
+                pre.append(Shared.append("("));
+                pre.append(Shared.append(valuesIn.replaceAll(":", ",")));
+                pre.append(Shared.append(")"));
+                break;
+            case "isnull":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("is null"));                
+                break;
+            case "isnotnull":
+                pre.append(Shared.append(mapFilterField.split(":")[1]));
+                pre.append(Shared.append("is not null"));                
+                break;
+        }
+        return pre;
     }
 
     private StringBuilder filterString(String mapFilterField) {
@@ -474,5 +559,5 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     public Session getSession() {
         return sessionFactory.getCurrentSession();
     }
-    
+
 }
