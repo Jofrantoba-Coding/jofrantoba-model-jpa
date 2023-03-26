@@ -65,4 +65,6 @@ public interface InterCrud<T extends Serializable> {
     Map<Integer, Object[]> sqlExportTOExcel(String sql)throws UnknownException;
     
     Collection<T> allFieldsJoinFilter(String joinTable,String mapJoinFilter,String[] mapOrder) throws UnknownException;
+    
+    Collection<T> allFieldsJoinFilterAnd(String joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException;
 }

@@ -180,7 +180,21 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(Shared.append("where 1=1"));
         sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));                
-        sql.append(Shared.append(orderStringSelect(mapOrder)));
+        sql.append(Shared.append(orderString(mapOrder).toString()));
+        Query query = getCurrentSession().createQuery(sql.toString());        
+        Collection<T> valores = query.list();
+        return valores;
+    }
+    
+    @Override
+    public Collection<T> allFieldsJoinFilterAnd(String joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select base from"));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(Shared.append(buildFilterStringSelect("and", mapFilter).toString()));
+        sql.append(Shared.append(orderString(mapOrder).toString()));
         Query query = getCurrentSession().createQuery(sql.toString());        
         Collection<T> valores = query.list();
         return valores;
@@ -216,6 +230,20 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
         return filters;
     }
+    
+    private StringBuilder buildFilterStringSelect(String conectorLogico, String[] mapFilterField) {
+        StringBuilder filter = new StringBuilder();
+        if (mapFilterField.length > 0) {
+            filter.append(Shared.append("where 1=1"));
+            for (int i = 0; i < mapFilterField.length; i++) {
+                filter.append(Shared.append(conectorLogico)).append(Shared.append(filterStringSelect(mapFilterField[i]).toString()));
+                //return filter;
+            }
+        } else {
+            filter.append(Shared.append("where 1=2"));
+        }
+        return filter;
+    }
 
     private StringBuilder buildFilterString(String conectorLogico, String[] mapFilterField) {
         StringBuilder filter = new StringBuilder();
@@ -223,7 +251,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             filter.append(Shared.append("where 1=1"));
             for (int i = 0; i < mapFilterField.length; i++) {
                 filter.append(Shared.append(conectorLogico)).append(Shared.append(filterString(mapFilterField[i]).toString()));
-                return filter;
+                //return filter;
             }
         } else {
             filter.append(Shared.append("where 1=2"));
@@ -247,18 +275,6 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             }
             criteria.orderBy(orders);
         }
-    }
-    
-    private String orderStringSelect(String... mapOrder) {        
-        if (mapOrder != null && mapOrder.length > 0) {
-            StringJoiner joiner = new StringJoiner(", ");
-            for (int i = 0; i < mapOrder.length; i++) {
-                String[] order=mapOrder[i].split(":");
-                joiner.add(order[0]+" "+order[1]);
-            }
-            return "order by "+joiner.toString();
-        }
-        return "";
     }
 
     private void orderString(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root, String... mapOrder) {
