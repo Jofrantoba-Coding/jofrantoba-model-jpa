@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -34,6 +33,8 @@ import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 
 /**
  *
@@ -179,12 +180,14 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(Shared.append("as base"));
         sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(Shared.append("where 1=1"));
-        sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));                
-        sql.append(Shared.append(orderString(mapOrder).toString()));
+        sql.append(Shared.append("and " + filterStringSelect(mapFilter).toString()));     
+        if (mapOrder != null) {
+            sql.append(Shared.append(orderString(mapOrder).toString()));
+        }        
         Query query = getCurrentSession().createQuery(sql.toString());        
         Collection<T> valores = query.list();
         return valores;
-    }
+    }        
     
     @Override
     public Collection<T> allFieldsJoinFilterAnd(String joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException {
@@ -197,6 +200,52 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(Shared.append(orderString(mapOrder).toString()));
         Query query = getCurrentSession().createQuery(sql.toString());        
         Collection<T> valores = query.list();
+        return valores;
+    }
+    
+    @Override
+    public Collection<T> customFieldsJoinFilterAnd(String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select").append(fields).append(Shared.append("from")));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(Shared.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        sql.append(Shared.append(orderString(mapOrder).toString()));
+        Query query = getCurrentSession().createQuery(sql.toString());                                           
+        query.setResultTransformer(Transformers.aliasToBean(clazz));
+        Collection valores = query.getResultList();
+        return valores;
+    }
+    
+    @Override
+    public Collection<?> customFieldsJoinFilterAnd(Class<?> dto,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select").append(fields).append(Shared.append("from")));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(Shared.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        sql.append(Shared.append(orderString(mapOrder).toString()));
+        Query query = getCurrentSession().createQuery(sql.toString());                                           
+        query.setResultTransformer(Transformers.aliasToBean(dto));
+        Collection valores = query.getResultList();
+        return valores;
+    }
+    
+    
+    @Override
+    public Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select").append(fields).append(Shared.append("from")));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(Shared.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        sql.append(Shared.append(orderString(mapOrder).toString()));
+        Query query = getCurrentSession().createQuery(sql.toString());                                           
+        query.setResultTransformer(rt);
+        Collection valores = query.getResultList();
         return valores;
     }
 

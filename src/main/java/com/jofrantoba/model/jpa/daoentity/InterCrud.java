@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.hibernate.Session;
+import org.hibernate.transform.ResultTransformer;
 
 /**
  *
@@ -67,4 +68,10 @@ public interface InterCrud<T extends Serializable> {
     Collection<T> allFieldsJoinFilter(String joinTable,String mapJoinFilter,String[] mapOrder) throws UnknownException;
     
     Collection<T> allFieldsJoinFilterAnd(String joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException;
+    
+    Collection<?> customFieldsJoinFilterAnd(Class<?> dto,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Collection<T> customFieldsJoinFilterAnd(String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;
 }
