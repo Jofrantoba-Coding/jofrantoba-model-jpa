@@ -204,6 +204,19 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
     
     @Override
+    public Long rowCountJoinFilterAnd(String joinTable, String[] mapFilterField) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select").append("count(*)").append(Shared.append("from")));
+        sql.append(clazz.getName());
+        sql.append(Shared.append("as base"));
+        sql.append(Shared.append(joinTable.split(":")[0]+" join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(Shared.append(buildFilterStringSelect("and", mapFilterField).toString()));        
+        Query query = getCurrentSession().createQuery(sql.toString());                                                   
+        Long count = (Long)query.uniqueResult();
+        return count;
+    }
+    
+    @Override
     public Collection<T> customFieldsJoinFilterAnd(String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         sql.append(Shared.append("select").append(fields).append(Shared.append("from")));
