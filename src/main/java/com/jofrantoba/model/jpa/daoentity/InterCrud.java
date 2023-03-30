@@ -47,6 +47,8 @@ public interface InterCrud<T extends Serializable> {
     
     Collection<T> allFields()throws UnknownException;    
     
+    Collection<T> allFieldsLimitOffsetPostgres(String table,String[] mapOrder,Long limit, Long offset)throws UnknownException;    
+    
     Collection<T> allFields(HashMap<String,String> mapOrder)throws UnknownException;
     
     Collection<T> allFields(String[] mapOrder)throws UnknownException;

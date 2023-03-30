@@ -70,7 +70,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     @Override
     public void save(final T entity) {
         Preconditions.checkNotNull(entity);
-        getCurrentSession().saveOrUpdate(entity);
+        getCurrentSession().saveOrUpdate(entity);        
     }
 
     @Override
@@ -108,6 +108,20 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         criteria.from(clazz);
         Collection<T> collection = getCurrentSession().createQuery(criteria).getResultList();
         return collection;
+    }
+    
+    @Override
+    public Collection<T> allFieldsLimitOffsetPostgres(String table,String[] mapOrder,Long limit, Long offset)throws UnknownException{
+        StringBuilder sql = new StringBuilder();
+        sql.append(Shared.append("select * from").append(Shared.append(table)));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        sql.append(Shared.append("limit :paramLimit offset :paramOffset"));
+        Query query=getCurrentSession().createNativeQuery(sql.toString(),clazz);
+        query.setParameter("paramLimit", limit);
+        query.setParameter("paramOffset", offset);
+        return query.getResultList();
     }
 
     @Override
