@@ -5,6 +5,7 @@
  */
 package com.jofrantoba.model.jpa.daoentity;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.io.Serializable;
 import java.util.Collection;
@@ -45,9 +46,7 @@ public interface InterCrud<T extends Serializable> {
     
     Session getSession()throws UnknownException;
     
-    Collection<T> allFields()throws UnknownException;    
-    
-    Collection<T> allFieldsLimitOffsetPostgres(String table,String[] mapOrder,Long limit, Long offset)throws UnknownException;    
+    Collection<T> allFields()throws UnknownException;            
     
     Collection<T> allFields(HashMap<String,String> mapOrder)throws UnknownException;
     
@@ -78,4 +77,10 @@ public interface InterCrud<T extends Serializable> {
     Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
     Long rowCountJoinFilterAnd(String joinTable, String[] mapFilterField) throws UnknownException;
+    
+    ArrayNode allFieldsLimitOffsetPostgres(String table,String fields,String[] mapFilterField,String[] mapOrder,Long limit, Long offset)throws UnknownException;
+    
+    ArrayNode allFieldsLimitOffsetPostgres(String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Collection<T> customFieldsJoinFilterAnd(String fields, String joinTable, String[] mapFilterField, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException;
 }

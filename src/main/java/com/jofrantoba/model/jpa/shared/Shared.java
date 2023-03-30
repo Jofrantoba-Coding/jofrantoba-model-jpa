@@ -17,7 +17,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author jona
  */
 public class Shared {
-    public static StringBuilder append(String str) {
+    
+    public StringBuilder append(String str) {
         StringBuilder concatena = new StringBuilder();
         concatena.append(" ");
         concatena.append(str);
@@ -25,7 +26,7 @@ public class Shared {
         return concatena;
     }
 
-    public static String strApostrofe(String str) {
+    public String strApostrofe(String str) {
         StringBuilder builder = new StringBuilder();
         builder.append("\'");
         builder.append(str);
@@ -33,37 +34,37 @@ public class Shared {
         return builder.toString();
     }
 
-    public static Long getUnixTime() {
+    public Long getUnixTime() {
         return System.currentTimeMillis();
     }
 
-    public static String getClean(String string) {
+    public String getClean(String string) {
         return StringUtils.stripAccents(string).trim();
     }
 
-    public static Long convertValueLong(String value) {
+    public Long convertValueLong(String value) {
         return (value != null && !value.isEmpty() ? Long.parseLong(value) : 0L);
     }
     
-    public static void closeResultSet(ResultSet rs) throws SQLException{
+    public void closeResultSet(ResultSet rs) throws SQLException{
         if(rs!=null){
             rs.close();
         }
     }
     
-    public static void closePreparedStatement(PreparedStatement st) throws SQLException{
+    public void closePreparedStatement(PreparedStatement st) throws SQLException{
         if(st!=null){
             st.close();
         }
     }
     
-    public static void closeCallableStatement(CallableStatement cst) throws SQLException{
+    public void closeCallableStatement(CallableStatement cst) throws SQLException{
         if(cst!=null){
             cst.close();
         }
     }
     
-    public static Object StringToObject(String tipo,String value){
+    public Object StringToObject(String tipo,String value){
         switch(tipo){
             case "String":
                 return value.isEmpty()?null:value;
@@ -82,7 +83,7 @@ public class Shared {
         }
     }
     
-    public static boolean notIsNullVacioObjects(Object... objetos){
+    public boolean notIsNullVacioObjects(Object... objetos){
         for(int i=0;i<objetos.length;i++){
             if(objetos[i]==null || objetos[i].toString().trim().length()==0){
                 return false;
