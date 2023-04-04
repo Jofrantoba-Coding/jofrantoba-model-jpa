@@ -34,6 +34,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.LockMode;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
@@ -115,13 +116,59 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
     
     @Override
-    public ArrayNode allFieldsLimitOffsetPostgres(String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+    public ArrayNode allFieldsPostgres(String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select"));
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData metadata = rs.getMetaData();
+                int size = metadata.getColumnCount();
+                while (rs.next()) {
+                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                    for (int i = 1; i <= size; i++) {
+                        log.debug(metadata.getColumnLabel(i));
+                        log.debug(metadata.getColumnClassName(i));
+                        log.debug(metadata.getColumnName(i));
+                        log.debug(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("varchar")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("serial")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+                        }
+                    }
+                    array.add(node);
+                }
+
+                sharedUtil.closePreparedStatement(ps);
+                sharedUtil.closeResultSet(rs);
+            }
+        });
+        return array;
+    }
+    
+    @Override
+    public ArrayNode allFieldsJoinPostgres(String joinTable,String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        String[] join=joinTable.split(":");
+        sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3]+"="+join[4]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
@@ -166,6 +213,55 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        sql.append(sharedUtil.append("limit ? offset ?"));
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
+                ps.setLong(1, limit);
+                ps.setLong(2, offset);
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData metadata = rs.getMetaData();
+                int size = metadata.getColumnCount();
+                while (rs.next()) {
+                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                    for (int i = 1; i <= size; i++) {
+                        log.debug(metadata.getColumnLabel(i));
+                        log.debug(metadata.getColumnClassName(i));
+                        log.debug(metadata.getColumnName(i));
+                        log.debug(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("varchar")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("serial")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+                        }
+                    }
+                    array.add(node);
+                }
+
+                sharedUtil.closePreparedStatement(ps);
+                sharedUtil.closeResultSet(rs);
+            }
+        });
+        return array;
+    }
+    
+    @Override
+    public ArrayNode allFieldsJoinLimitOffsetPostgres(String joinTable,String table, String fields, String[] mapFilterField, String[] mapOrder, Long limit, Long offset) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        String[] join=joinTable.split(":");
+        sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3]+"="+join[4]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
@@ -333,6 +429,20 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         query.setResultTransformer(Transformers.aliasToBean(clazz));
         Collection valores = query.getResultList();
         return valores;
+    }
+    
+    @Override
+    public Collection<T> allFields(String mapFilterField, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException {
+        CriteriaBuilder build = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<T> criteria = build.createQuery(clazz);
+        Root<T> root = criteria.from(clazz);
+        orderString(build, criteria, root, mapOrder);
+        criteria.select(root).where(filterString(build, criteria, root, mapFilterField));
+        Query query = getCurrentSession().createQuery(criteria);
+        query.setFirstResult((pageNumber - 1) * pageSize);
+        query.setMaxResults(pageSize);
+        Collection<T> collection = query.getResultList();
+        return collection;
     }
 
     @Override
