@@ -86,7 +86,9 @@ public interface InterCrud<T extends Serializable> {
     
     Collection<T> allFields(String mapFilterField, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException;
     
-    ArrayNode allFieldsJoinPostgres(String joinTable,String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    ArrayNode allFieldsJoinPostgres(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
-    ArrayNode allFieldsJoinLimitOffsetPostgres(String joinTable,String table, String fields, String[] mapFilterField, String[] mapOrder, Long limit, Long offset) throws UnknownException;
+    ArrayNode allFieldsJoinLimitOffsetPostgres(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder, Long limit, Long offset) throws UnknownException;
+    
+    Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt, String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException;
 }
