@@ -50,7 +50,7 @@ import org.hibernate.transform.Transformers;
 public abstract class AbstractJpaDao<T extends Serializable> implements InterCrud<T> {
 
     private Class<T> clazz;
-
+    
     private SessionFactory sessionFactory;
 
     public void setSessionFactory(SessionFactory sessionFactory) {
