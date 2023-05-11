@@ -430,6 +430,25 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Long count = (Long) query.uniqueResult();
         return count;
     }
+    
+    @Override
+    public Long aggregateJoinFilterAndGroupBy(String fields,String joinTable, String[] mapFilterField,String groupBy) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select").append(fields).append(sharedUtil.append("from")));
+        sql.append(clazz.getName());
+        sql.append(sharedUtil.append("as base"));
+        if (joinTable != null) {
+            sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        }
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if(groupBy!=null){
+            sql.append(sharedUtil.append(groupBy));
+        }
+        Query query = getCurrentSession().createQuery(sql.toString());
+        Long count = (Long) query.uniqueResult();
+        return count;
+    }
 
     @Override
     public Collection<T> customFieldsJoinFilterAnd(String fields, String joinTable, String[] mapFilterField, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException {

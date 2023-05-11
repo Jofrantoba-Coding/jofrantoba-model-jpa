@@ -91,4 +91,6 @@ public interface InterCrud<T extends Serializable> {
     ArrayNode allFieldsJoinLimitOffsetPostgres(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder, Long limit, Long offset) throws UnknownException;
     
     Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt, String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Long aggregateJoinFilterAndGroupBy(String fields,String joinTable, String[] mapFilterField,String groupBy) throws UnknownException;
 }
