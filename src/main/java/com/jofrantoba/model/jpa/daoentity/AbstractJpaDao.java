@@ -189,18 +189,18 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
                 while (rs.next()) {
                     ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
                     for (int i = 1; i <= size; i++) {
-                        log.debug(metadata.getColumnLabel(i));
-                        log.debug(metadata.getColumnClassName(i));
-                        log.debug(metadata.getColumnName(i));
-                        log.debug(metadata.getColumnTypeName(i));
+                        log.error(metadata.getColumnLabel(i));
+                        log.error(metadata.getColumnClassName(i));
+                        log.error(metadata.getColumnName(i));
+                        log.error(metadata.getColumnTypeName(i));
                         if (metadata.getColumnTypeName(i).equals("varchar")) {
                             node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
                         }
                         if (metadata.getColumnTypeName(i).equals("serial")) {
-                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
                         }
                         if (metadata.getColumnTypeName(i).equals("int8")) {
-                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
                         }
                     }
                     array.add(node);
