@@ -189,10 +189,219 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
                 while (rs.next()) {
                     ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
                     for (int i = 1; i <= size; i++) {
-                        log.error(metadata.getColumnLabel(i));
-                        log.error(metadata.getColumnClassName(i));
-                        log.error(metadata.getColumnName(i));
-                        log.error(metadata.getColumnTypeName(i));
+                        log.debug(metadata.getColumnLabel(i));
+                        log.debug(metadata.getColumnClassName(i));
+                        log.debug(metadata.getColumnName(i));
+                        log.debug(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("varchar")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("serial")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("int8")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                    }
+                    array.add(node);
+                }
+
+                sharedUtil.closePreparedStatement(ps);
+                sharedUtil.closeResultSet(rs);
+            }
+        });
+        return array;
+    }
+    
+    
+    @Override
+    public ArrayNode allFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder,String groupBy) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        for (String joinTable : joinTables) {
+            String[] join = joinTable.split(":");
+            sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
+        }
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if(groupBy!=null){
+            sql.append(sharedUtil.append("group by"));
+            sql.append(sharedUtil.append(groupBy));
+        }
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData metadata = rs.getMetaData();
+                int size = metadata.getColumnCount();
+                while (rs.next()) {
+                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                    for (int i = 1; i <= size; i++) {
+                        log.info(metadata.getColumnLabel(i));
+                        log.info(metadata.getColumnClassName(i));
+                        log.info(metadata.getColumnName(i));
+                        log.info(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("text")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("varchar")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("serial")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("int8")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                    }
+                    array.add(node);
+                }
+
+                sharedUtil.closePreparedStatement(ps);
+                sharedUtil.closeResultSet(rs);
+            }
+        });
+        return array;
+    }
+    
+    @Override
+    public ArrayNode allFieldsJoinPostgresGroupBySubQuery(String fields,String groupBy,String[] mapOrder,String[] joinTablesSq, String tableSq, String fieldsSq, String[] mapFilterFieldSq,String groupBySq) throws UnknownException {
+        StringBuilder subquery = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        subquery.append(sharedUtil.append("select"));
+        subquery.append(sharedUtil.append(fieldsSq));
+        subquery.append(sharedUtil.append("from"));
+        subquery.append(sharedUtil.append(tableSq));
+        for (String joinTable : joinTablesSq) {
+            String[] join = joinTable.split(":");
+            subquery.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
+        }
+        subquery.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterFieldSq).toString()));
+        if(groupBySq!=null){
+            subquery.append(sharedUtil.append("group by"));
+            subquery.append(sharedUtil.append(groupBySq));
+        }
+      
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append("(");
+        sql.append(subquery.toString());
+        sql.append(") as subquery");
+        
+        if(groupBy!=null){
+            sql.append(sharedUtil.append("group by"));
+            sql.append(sharedUtil.append(groupBy));
+        }
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        
+        
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData metadata = rs.getMetaData();
+                int size = metadata.getColumnCount();
+                while (rs.next()) {
+                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                    for (int i = 1; i <= size; i++) {
+                        log.info(metadata.getColumnLabel(i));
+                        log.info(metadata.getColumnClassName(i));
+                        log.info(metadata.getColumnName(i));
+                        log.info(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("text")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("varchar")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("serial")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                        if (metadata.getColumnTypeName(i).equals("int8")) {
+                            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i))==0?null:rs.getLong(metadata.getColumnName(i)));
+                        }
+                    }
+                    array.add(node);
+                }
+
+                sharedUtil.closePreparedStatement(ps);
+                sharedUtil.closeResultSet(rs);
+            }
+        });
+        return array;
+    }
+    
+    @Override
+    public ArrayNode allFieldsLimitJoinPostgresGroupBySubQuery(String fields,String groupBy,String[] mapOrder,String[] joinTablesSq, String tableSq, String fieldsSq, String[] mapFilterFieldSq,String groupBySq,Long limit, Long offset) throws UnknownException {
+        StringBuilder subquery = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        subquery.append(sharedUtil.append("select"));
+        subquery.append(sharedUtil.append(fieldsSq));
+        subquery.append(sharedUtil.append("from"));
+        subquery.append(sharedUtil.append(tableSq));
+        for (String joinTable : joinTablesSq) {
+            String[] join = joinTable.split(":");
+            subquery.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
+        }
+        subquery.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterFieldSq).toString()));
+        if(groupBySq!=null){
+            subquery.append(sharedUtil.append("group by"));
+            subquery.append(sharedUtil.append(groupBySq));
+        }
+      
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append("(");
+        sql.append(subquery.toString());
+        sql.append(") as subquery");
+        
+        if(groupBy!=null){
+            sql.append(sharedUtil.append("group by"));
+            sql.append(sharedUtil.append(groupBy));
+        }
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        sql.append(sharedUtil.append("limit ? offset ?"));
+        
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
+                ps.setLong(1, limit);
+                ps.setLong(2, offset);
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData metadata = rs.getMetaData();
+                int size = metadata.getColumnCount();
+                while (rs.next()) {
+                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                    for (int i = 1; i <= size; i++) {
+                        log.info(metadata.getColumnLabel(i));
+                        log.info(metadata.getColumnClassName(i));
+                        log.info(metadata.getColumnName(i));
+                        log.info(metadata.getColumnTypeName(i));
+                        if (metadata.getColumnTypeName(i).equals("text")) {
+                            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
+                        }
                         if (metadata.getColumnTypeName(i).equals("varchar")) {
                             node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
                         }

@@ -88,6 +88,12 @@ public interface InterCrud<T extends Serializable> {
     
     ArrayNode allFieldsJoinPostgres(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
+    ArrayNode allFieldsJoinPostgresGroupBy(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder,String groupBy) throws UnknownException;
+    
+    ArrayNode allFieldsLimitJoinPostgresGroupBySubQuery(String fields,String groupBy,String[] mapOrder,String[] joinTablesSq, String tableSq, String fieldsSq, String[] mapFilterFieldSq,String groupBySq,Long limit, Long offset) throws UnknownException;
+    
+    ArrayNode allFieldsJoinPostgresGroupBySubQuery(String fields,String groupBy,String[] mapOrder,String[] joinTablesSq, String tableSq, String fieldsSq, String[] mapFilterFieldSq,String groupBySq) throws UnknownException;
+    
     ArrayNode allFieldsJoinLimitOffsetPostgres(String[] joinTables,String table, String fields, String[] mapFilterField, String[] mapOrder, Long limit, Long offset) throws UnknownException;
     
     Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt, String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException;
