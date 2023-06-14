@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -406,6 +407,13 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
         if (metadata.getColumnTypeName(i).equals("int8")) {
             node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+        }
+        if (metadata.getColumnTypeName(i).equals("date")) {            
+            java.sql.Date fecha=rs.getDate(metadata.getColumnName(i));
+            SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+            String fechaStr=df.format(new java.util.Date(fecha.getTime()));
+            node.put(metadata.getColumnName(i)+"longtime", fecha.getTime());
+            node.put(metadata.getColumnName(i), fechaStr);
         }
     }
 
