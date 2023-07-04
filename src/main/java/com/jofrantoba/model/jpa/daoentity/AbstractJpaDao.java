@@ -408,12 +408,17 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         if (metadata.getColumnTypeName(i).equals("int8")) {
             node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
         }
-        if (metadata.getColumnTypeName(i).equals("date")) {            
-            java.sql.Date fecha=rs.getDate(metadata.getColumnName(i));
-            SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
-            String fechaStr=df.format(new java.util.Date(fecha.getTime()));
-            node.put(metadata.getColumnName(i)+"longtime", fecha.getTime());
-            node.put(metadata.getColumnName(i), fechaStr);
+        if (metadata.getColumnTypeName(i).equals("date")) {
+            java.sql.Date fecha = rs.getDate(metadata.getColumnName(i));
+            if (fecha != null) {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String fechaStr = df.format(new java.util.Date(fecha.getTime()));
+                node.put(metadata.getColumnName(i) + "longtime", fecha.getTime());
+                node.put(metadata.getColumnName(i), fechaStr);
+            } else {
+                node.put(metadata.getColumnName(i) + "longtime", 0);
+                node.put(metadata.getColumnName(i), "");
+            }
         }
     }
 
