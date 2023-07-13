@@ -132,20 +132,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
             }
         });
         return array;
@@ -171,20 +158,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
             }
         });
         return array;
@@ -214,20 +188,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
             }
         });
         return array;
@@ -271,20 +232,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
             }
         });
         return array;
@@ -329,22 +277,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ps.setLong(1, limit);
-                ps.setLong(2, offset);
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                
             }
         });
         return array;
@@ -367,22 +300,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ps.setLong(1, limit);
-                ps.setLong(2, offset);
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                
             }
         });
         return array;
@@ -443,22 +361,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                PreparedStatement ps = cnctn.prepareStatement(sql.toString());
-                ps.setLong(1, limit);
-                ps.setLong(2, offset);
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                while (rs.next()) {
-                    ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-                    for (int i = 1; i <= size; i++) {
-                        typesSet(node, rs, metadata, i);
-                    }
-                    array.add(node);
-                }
-
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                                
             }
         });
         return array;
@@ -570,6 +473,22 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
         if (joinTable != null) {
+            sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        }
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        Query query = getCurrentSession().createQuery(sql.toString());
+        Long count = (Long) query.uniqueResult();
+        return count;
+    }
+    
+    @Override
+    public Long rowCountJoinsFilterAnd(String[] joinTables, String[] mapFilterField) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select").append("count(*)").append(sharedUtil.append("from")));
+        sql.append(clazz.getName());
+        sql.append(sharedUtil.append("as base"));
+        for (String joinTable : joinTables) {
             sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
@@ -1009,17 +928,24 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             @Override
             public void execute(Connection connection) throws SQLException {
                 Shared sharedUtil = new Shared();
-                PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
-                ResultSetMetaData metadata = rs.getMetaData();
-                int size = metadata.getColumnCount();
-                Object[] cabecera = new Object[size];
-                for (int i = 1; i <= size; i++) {
-                    cabecera[i - 1] = metadata.getColumnLabel(i);
+                PreparedStatement ps = null;
+                ResultSet rs = null;
+                try {
+                    ps = connection.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    ResultSetMetaData metadata = rs.getMetaData();
+                    int size = metadata.getColumnCount();
+                    Object[] cabecera = new Object[size];
+                    for (int i = 1; i <= size; i++) {
+                        cabecera[i - 1] = metadata.getColumnLabel(i);
+                    }
+                    data.put(1, cabecera);
+                } catch (SQLException ex) {
+                    throw ex;
+                } finally {
+                    sharedUtil.closePreparedStatement(ps);
+                    sharedUtil.closeResultSet(rs);
                 }
-                data.put(1, cabecera);
-                sharedUtil.closePreparedStatement(ps);
-                sharedUtil.closeResultSet(rs);
             }
         });
         int i = 2;
@@ -1094,4 +1020,30 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return sessionFactory.getCurrentSession();
     }
 
+    private void executeStatement(Connection cnctn, String sql, Shared sharedUtil, ArrayNode array, Long limit, Long offset) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = cnctn.prepareStatement(sql);
+            if (limit != null && offset != null) {
+                ps.setLong(1, limit);
+                ps.setLong(2, offset);
+            }
+            rs = ps.executeQuery();
+            ResultSetMetaData metadata = rs.getMetaData();
+            int size = metadata.getColumnCount();
+            while (rs.next()) {
+                ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+                for (int i = 1; i <= size; i++) {
+                    typesSet(node, rs, metadata, i);
+                }
+                array.add(node);
+            }
+        } catch (SQLException ex) {
+            throw ex;
+        } finally {
+            sharedUtil.closePreparedStatement(ps);
+            sharedUtil.closeResultSet(rs);
+        }
+    }
 }

@@ -78,6 +78,8 @@ public interface InterCrud<T extends Serializable> {
     
     Long rowCountJoinFilterAnd(String joinTable, String[] mapFilterField) throws UnknownException;
     
+    Long rowCountJoinsFilterAnd(String[] joinTables, String[] mapFilterField) throws UnknownException;
+    
     ArrayNode allFieldsLimitOffsetPostgres(String table,String fields,String[] mapFilterField,String[] mapOrder,Long limit, Long offset)throws UnknownException;
     
     ArrayNode allFieldsPostgres(String table, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
