@@ -60,6 +60,8 @@ public interface InterCrud<T extends Serializable> {
     
     Collection<T> customFields(String fields) throws UnknownException;
     
+    Collection<T> customFields(ResultTransformer rt,String fields) throws UnknownException;
+    
     Collection<T> customFieldsFilterAnd(String fields,String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
     Collection<T> customFieldsFilterOr(String fields,String[] mapFilterField, String[] mapOrder) throws UnknownException;

@@ -35,7 +35,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.LockMode;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
@@ -375,12 +374,23 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Query query = getCurrentSession().createQuery(sql.toString());
         return query.list();
     }
+    
+    @Override
+    public Collection<T> customFields(ResultTransformer rt,String fields) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as clase"));
+        Query query = getCurrentSession().createQuery(sql.toString());
+        query.setResultTransformer(rt);
+        Collection valores = query.getResultList();
+        return valores;
+    }
 
     @Override
     public Collection<T> customFieldsFilterAnd(String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
-        sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as clase"));
+        sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as base"));
         sql.append(buildFilterString("and", mapFilterField));
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
@@ -803,6 +813,11 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         StringBuilder pre = new StringBuilder();
         Shared sharedUtil = new Shared();
         switch (mapFilterField.split(":")[0]) {
+            case "equal":
+                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append("="));
+                pre.append(sharedUtil.append("\'").append(mapFilterField.split(":")[2]).append("\'"));
+                break;
             case ">":
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
                 pre.append(sharedUtil.append(">"));
@@ -862,7 +877,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             case "isnotnull":
                 pre.append(sharedUtil.append("is not null"));
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
-                break;
+                break;                
         }
         return pre;
     }
