@@ -387,6 +387,21 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
+    public Collection<?> customFieldsFilterAnd(Class<?> dto,String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as base"));
+        sql.append(buildFilterString("and", mapFilterField));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        Query query = getCurrentSession().createQuery(sql.toString());
+        query.setResultTransformer(Transformers.aliasToBean(dto));
+        Collection valores = query.getResultList();
+        return valores;        
+    }
+    
+    @Override
     public Collection<T> customFieldsFilterAnd(String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
@@ -816,7 +831,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             case "equal":
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
                 pre.append(sharedUtil.append("="));
-                pre.append(sharedUtil.append("\'").append(mapFilterField.split(":")[2]).append("\'"));
+                pre.append(sharedUtil.append("\'"+mapFilterField.split(":")[2]+"\'"));
                 break;
             case ">":
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
@@ -976,7 +991,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
-    public int saveNativeQuery(String table, String[] fieldValues) {
+    public int saveNativeQuery(String table, String[] fieldValues)throws UnknownException {
         StringBuilder builder = new StringBuilder();
         Shared sharedUtil = new Shared();
         builder.append(sharedUtil.append("INSERT INTO "));
@@ -1006,6 +1021,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             String paramField = iteradorKey.next();
             query.setParameter(paramField, queryParam.get(paramField));
         }
+        int value = query.executeUpdate();
+        return value;
+    }
+            
+    public int iudNativeQuery(String sql)throws UnknownException { 
+        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);
         int value = query.executeUpdate();
         return value;
     }

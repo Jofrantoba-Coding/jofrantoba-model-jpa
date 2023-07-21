@@ -27,6 +27,8 @@ public interface InterCrud<T extends Serializable> {
     void save(final T entity)throws UnknownException;
     
     int saveNativeQuery(String table,String[] fieldValue)throws UnknownException;
+    
+    int iudNativeQuery(String sql)throws UnknownException;
 
     void update(final T entity)throws UnknownException;
 
@@ -103,4 +105,6 @@ public interface InterCrud<T extends Serializable> {
     Collection<?> customFieldsJoinFilterAnd(ResultTransformer rt, String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
     Long aggregateJoinFilterAndGroupBy(String fields,String joinTable, String[] mapFilterField,String groupBy) throws UnknownException;
+    
+    Collection<?> customFieldsFilterAnd(Class<?> dto,String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
 }
