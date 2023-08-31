@@ -1054,7 +1054,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     @Override
     public Session getSession() {
         return sessionFactory.getCurrentSession();
-    }
+    }   
+    
+    @Override
+    public Session getNewSession() {
+        return sessionFactory.openSession();
+    }   
 
     private void executeStatement(Connection cnctn, String sql, Shared sharedUtil, ArrayNode array, Long limit, Long offset) throws SQLException {
         PreparedStatement ps = null;

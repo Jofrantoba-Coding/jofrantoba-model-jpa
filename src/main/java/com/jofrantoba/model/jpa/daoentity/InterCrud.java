@@ -48,6 +48,8 @@ public interface InterCrud<T extends Serializable> {
     
     Session getSession()throws UnknownException;
     
+    Session getNewSession()throws UnknownException;
+    
     Collection<T> allFields()throws UnknownException;            
     
     Collection<T> allFields(HashMap<String,String> mapOrder)throws UnknownException;
