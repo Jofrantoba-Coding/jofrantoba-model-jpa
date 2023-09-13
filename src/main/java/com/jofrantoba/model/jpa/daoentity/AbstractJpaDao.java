@@ -484,7 +484,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("as base"));
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilter).toString()));
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        if (mapOrder != null) {
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }        
         Query query = getCurrentSession().createQuery(sql.toString());
         Collection<T> valores = query.list();
         return valores;
@@ -550,7 +552,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("as base"));
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
         sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setFirstResult((pageNumber - 1) * pageSize);
         query.setMaxResults(pageSize);
@@ -582,7 +586,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("as base"));
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
         sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(clazz));
         Collection valores = query.getResultList();
@@ -598,7 +604,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("as base"));
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
         sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(dto));
         Collection valores = query.getResultList();
@@ -614,7 +622,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("as base"));
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
         sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(rt);
         Collection valores = query.getResultList();
@@ -632,7 +642,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
         sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(rt);
         Collection valores = query.getResultList();
@@ -831,6 +843,11 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             case "equal":
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
                 pre.append(sharedUtil.append("="));
+                pre.append(sharedUtil.append("\'"+mapFilterField.split(":")[2]+"\'"));
+                break;
+            case "notequal":
+                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append("!="));
                 pre.append(sharedUtil.append("\'"+mapFilterField.split(":")[2]+"\'"));
                 break;
             case ">":

@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Shared {
     
-    public StringBuilder append(String str) {
+    public StringBuilder append(String str) {        
         StringBuilder concatena = new StringBuilder();
         concatena.append(" ");
         concatena.append(str);
