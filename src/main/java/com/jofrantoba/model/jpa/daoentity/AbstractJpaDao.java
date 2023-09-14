@@ -797,6 +797,11 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
                 pre.append(sharedUtil.append("="));
                 pre.append(sharedUtil.append("\'" + mapFilterField.split(":")[2] + "\'"));
                 break;
+            case "notequal":
+                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append("!="));
+                pre.append(sharedUtil.append("\'" + mapFilterField.split(":")[2] + "\'"));
+                break;
             case "!=":
                 pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
                 pre.append(sharedUtil.append("!="));
