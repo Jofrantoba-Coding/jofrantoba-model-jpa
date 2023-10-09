@@ -109,4 +109,10 @@ public interface InterCrud<T extends Serializable> {
     Long aggregateJoinFilterAndGroupBy(String fields,String joinTable, String[] mapFilterField,String groupBy) throws UnknownException;
     
     Collection<?> customFieldsFilterAnd(Class<?> dto,String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Object maxValueJoinFilterAnd(String field,String joinTable, String[] mapFilterField)throws UnknownException;
+    
+    Collection<T> customFieldsJoinFilterAnd(String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException;
+    
+    Collection<T> customFieldsJoinFilterAnd(String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException;
 }
