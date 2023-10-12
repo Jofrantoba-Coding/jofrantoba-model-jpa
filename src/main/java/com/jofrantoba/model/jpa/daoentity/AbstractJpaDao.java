@@ -464,13 +464,35 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("select base from"));
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
-        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
+        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join "+ fetch +" base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append("where 1=1"));
         sql.append(sharedUtil.append("and " + filterStringSelect(mapFilter).toString()));
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
+        Collection<T> valores = query.list();
+        return valores;
+    }
+    
+    @Override
+    public Collection<T> allFieldsJoinFilter(String joinTable, String mapFilter, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select base from"));
+        sql.append(clazz.getName());
+        sql.append(sharedUtil.append("as base"));
+        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
+        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join "+fetch+" base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        sql.append(sharedUtil.append("where 1=1"));
+        sql.append(sharedUtil.append("and " + filterStringSelect(mapFilter).toString()));
+        if (mapOrder != null) {
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
+        Query query = getCurrentSession().createQuery(sql.toString());
+        query.setFirstResult((pageNumber - 1) * pageSize);
+        query.setMaxResults(pageSize);
         Collection<T> valores = query.list();
         return valores;
     }
