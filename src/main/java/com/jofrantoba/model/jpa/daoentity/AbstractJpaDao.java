@@ -100,7 +100,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     public int deleteFilterAnd(String[] mapFilterField) {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
-        sql.append(sharedUtil.append("delete")).append(sharedUtil.append("from")).append(clazz.getName());
+        sql.append(sharedUtil.append("delete")).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as base"));
         sql.append(buildFilterString("and", mapFilterField));
         Query query = getCurrentSession().createQuery(sql.toString());
         return query.executeUpdate();
@@ -322,8 +322,11 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         if (metadata.getColumnTypeName(i).equals("serial")) {
             node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
         }
-        if (metadata.getColumnTypeName(i).equals("int8")) {
+        if (metadata.getColumnTypeName(i).equals("int8") || metadata.getColumnTypeName(i).equals("int4")) {
             node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
+        }
+        if (metadata.getColumnTypeName(i).equals("bool")) {
+            node.put(metadata.getColumnName(i), rs.getBoolean(metadata.getColumnName(i)));
         }
         if (metadata.getColumnTypeName(i).equals("date")) {
             java.sql.Date fecha = rs.getDate(metadata.getColumnName(i));
