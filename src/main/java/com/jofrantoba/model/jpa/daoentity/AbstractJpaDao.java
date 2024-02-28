@@ -145,6 +145,23 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
+        joins(joinTables, sql);
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }
+        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
+        this.getCurrentSession().doWork(new Work() {
+            @Override
+            public void execute(Connection cnctn) throws SQLException {
+                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
+            }
+        });
+        return array;
+    }
+    
+    private void joins(String[] joinTables,StringBuilder sql){
+        Shared sharedUtil = new Shared();
         for (String joinTable : joinTables) {
             String[] join = joinTable.split(":");
             sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on "));
@@ -162,18 +179,6 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
                 ++nextValue;
             }
         }
-        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
-        if (mapOrder != null) {
-            sql.append(orderString(mapOrder));
-        }
-        ArrayNode array = new ArrayNode(JsonNodeFactory.instance);
-        this.getCurrentSession().doWork(new Work() {
-            @Override
-            public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
-            }
-        });
-        return array;
     }
 
     @Override
@@ -363,10 +368,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
-        for (String joinTable : joinTables) {
-            String[] join = joinTable.split(":");
-            sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
-        }
+        joins(joinTables, sql);
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
