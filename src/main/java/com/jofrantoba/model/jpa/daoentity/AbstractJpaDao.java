@@ -147,7 +147,20 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(table));
         for (String joinTable : joinTables) {
             String[] join = joinTable.split(":");
-            sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
+            sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on "));
+            if(join.length==5){
+                sql.append(sharedUtil.append(join[3] + "=" + join[4]));
+                continue;
+            }
+            int nextValue=3;
+            while(nextValue<join.length){
+                sql.append(sharedUtil.append(join[nextValue] + "=" + join[++nextValue]));
+                if(++nextValue==join.length){
+                    break;
+                }
+                sql.append(sharedUtil.append(join[nextValue]));
+                ++nextValue;
+            }
         }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
