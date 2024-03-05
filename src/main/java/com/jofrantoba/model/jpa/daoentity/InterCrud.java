@@ -119,4 +119,8 @@ public interface InterCrud<T extends Serializable> {
     Collection<T> allFieldsJoinFilter(String joinTable, String mapFilter, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException;
     
     Collection<T> allFieldsJoinFilterAnd(String joinTable, String[] mapFilter, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException;
+    
+    StringBuilder strAllFieldsJoinPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder);
+    
+    StringBuilder strAllFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy);
 }

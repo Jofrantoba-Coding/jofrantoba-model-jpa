@@ -160,6 +160,22 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return array;
     }
     
+    @Override
+    public StringBuilder strAllFieldsJoinPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder){
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        joins(joinTables, sql);
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }        
+        return sql;
+    }
+    
     private void joins(String[] joinTables,StringBuilder sql){
         Shared sharedUtil = new Shared();
         for (String joinTable : joinTables) {
@@ -189,10 +205,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
-        for (String joinTable : joinTables) {
-            String[] join = joinTable.split(":");
-            sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on " + join[3] + "=" + join[4]));
-        }
+        joins(joinTables, sql);        
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (groupBy != null) {
             sql.append(sharedUtil.append("group by"));
@@ -209,6 +222,26 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             }
         });
         return array;
+    }
+    
+    @Override
+    public StringBuilder strAllFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy){
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        joins(joinTables, sql);        
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (groupBy != null) {
+            sql.append(sharedUtil.append("group by"));
+            sql.append(sharedUtil.append(groupBy));
+        }
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }        
+        return sql;
     }
 
     @Override
@@ -1231,7 +1264,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             while (rs.next()) {
                 ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
                 for (int i = 1; i <= size; i++) {
-                    typesSet(node, rs, metadata, i);
+                    typesSet(node, rs, metadata, i);                    
                 }
                 array.add(node);
             }
