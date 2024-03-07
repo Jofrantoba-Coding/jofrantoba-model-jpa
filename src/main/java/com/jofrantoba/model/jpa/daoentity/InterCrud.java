@@ -123,4 +123,6 @@ public interface InterCrud<T extends Serializable> {
     StringBuilder strAllFieldsJoinPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder);
     
     StringBuilder strAllFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy);
+    
+    StringBuilder strAllFieldsJoinGroupByLimitOffsetPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy, Long limit, Long offset);
 }

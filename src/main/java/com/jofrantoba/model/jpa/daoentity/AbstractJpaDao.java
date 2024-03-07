@@ -243,6 +243,27 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }        
         return sql;
     }
+    
+    @Override
+    public StringBuilder strAllFieldsJoinGroupByLimitOffsetPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy, Long limit, Long offset){
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select"));
+        sql.append(sharedUtil.append(fields));
+        sql.append(sharedUtil.append("from"));
+        sql.append(sharedUtil.append(table));
+        joins(joinTables, sql);        
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
+        if (groupBy != null) {
+            sql.append(sharedUtil.append("group by"));
+            sql.append(sharedUtil.append(groupBy));
+        }
+        if (mapOrder != null) {
+            sql.append(orderString(mapOrder));
+        }        
+        sql.append(sharedUtil.append("limit ? offset ?"));
+        return sql;
+    }
 
     @Override
     public ArrayNode allFieldsJoinPostgresGroupBySubQuery(String fields, String groupBy, String[] mapOrder, String[] joinTablesSq, String tableSq, String fieldsSq, String[] mapFilterFieldSq, String groupBySq) throws UnknownException {
