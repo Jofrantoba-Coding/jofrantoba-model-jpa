@@ -131,7 +131,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, null, null);
             }
         });
         return array;
@@ -154,14 +154,14 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, null, null);
             }
         });
         return array;
     }
-    
+
     @Override
-    public StringBuilder strAllFieldsJoinPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder){
+    public StringBuilder strAllFieldsJoinPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder) {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select"));
@@ -172,23 +172,23 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
-        }        
+        }
         return sql;
     }
-    
-    private void joins(String[] joinTables,StringBuilder sql){
+
+    private void joins(String[] joinTables, StringBuilder sql) {
         Shared sharedUtil = new Shared();
         for (String joinTable : joinTables) {
             String[] join = joinTable.split(":");
             sql.append(sharedUtil.append(join[0] + " join " + join[1] + " on "));
-            if(join.length==5){
+            if (join.length == 5) {
                 sql.append(sharedUtil.append(join[3] + "=" + join[4]));
                 continue;
             }
-            int nextValue=3;
-            while(nextValue<join.length){
+            int nextValue = 3;
+            while (nextValue < join.length) {
                 sql.append(sharedUtil.append(join[nextValue] + "=" + join[++nextValue]));
-                if(++nextValue==join.length){
+                if (++nextValue == join.length) {
                     break;
                 }
                 sql.append(sharedUtil.append(join[nextValue]));
@@ -205,7 +205,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
-        joins(joinTables, sql);        
+        joins(joinTables, sql);
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (groupBy != null) {
             sql.append(sharedUtil.append("group by"));
@@ -218,21 +218,21 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, null, null);
             }
         });
         return array;
     }
-    
+
     @Override
-    public StringBuilder strAllFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy){
+    public StringBuilder strAllFieldsJoinPostgresGroupBy(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy) {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select"));
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
-        joins(joinTables, sql);        
+        joins(joinTables, sql);
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (groupBy != null) {
             sql.append(sharedUtil.append("group by"));
@@ -240,19 +240,19 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
-        }        
+        }
         return sql;
     }
-    
+
     @Override
-    public StringBuilder strAllFieldsJoinGroupByLimitOffsetPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy, Long limit, Long offset){
+    public StringBuilder strAllFieldsJoinGroupByLimitOffsetPostgres(String[] joinTables, String table, String fields, String[] mapFilterField, String[] mapOrder, String groupBy, Long limit, Long offset) {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select"));
         sql.append(sharedUtil.append(fields));
         sql.append(sharedUtil.append("from"));
         sql.append(sharedUtil.append(table));
-        joins(joinTables, sql);        
+        joins(joinTables, sql);
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (groupBy != null) {
             sql.append(sharedUtil.append("group by"));
@@ -260,7 +260,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
         if (mapOrder != null) {
             sql.append(orderString(mapOrder));
-        }        
+        }
         sql.append(sharedUtil.append("limit ? offset ?"));
         return sql;
     }
@@ -303,7 +303,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,null,null);
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, null, null);
             }
         });
         return array;
@@ -348,7 +348,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, limit, offset);
             }
         });
         return array;
@@ -371,7 +371,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, limit, offset);
             }
         });
         return array;
@@ -432,7 +432,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         this.getCurrentSession().doWork(new Work() {
             @Override
             public void execute(Connection cnctn) throws SQLException {
-                executeStatement(cnctn, sql.toString(), sharedUtil, array,limit,offset);                                
+                executeStatement(cnctn, sql.toString(), sharedUtil, array, limit, offset);
             }
         });
         return array;
@@ -446,9 +446,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Query query = getCurrentSession().createQuery(sql.toString());
         return query.list();
     }
-    
+
     @Override
-    public Collection<T> customFields(ResultTransformer rt,String fields) throws UnknownException {
+    public Collection<T> customFields(ResultTransformer rt, String fields) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as clase"));
@@ -459,7 +459,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
-    public Collection<?> customFieldsFilterAnd(Class<?> dto,String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
+    public Collection<?> customFieldsFilterAnd(Class<?> dto, String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select")).append(fields).append(sharedUtil.append("from")).append(clazz.getName()).append(sharedUtil.append("as base"));
@@ -470,9 +470,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(dto));
         Collection valores = query.getResultList();
-        return valores;        
+        return valores;
     }
-    
+
     @Override
     public Collection<T> customFieldsFilterAnd(String fields, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
@@ -536,8 +536,8 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("select base from"));
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
-        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
-        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join "+ fetch +" base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        String fetch = joinTable.split(":")[2] != null ? joinTable.split(":")[2] : "";
+        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + fetch + " base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append("where 1=1"));
         sql.append(sharedUtil.append("and " + filterStringSelect(mapFilter).toString()));
         if (mapOrder != null) {
@@ -547,16 +547,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Collection<T> valores = query.list();
         return valores;
     }
-    
+
     @Override
-    public Collection<T> allFieldsJoinFilter(String joinTable, String mapFilter, String[] mapOrder,int pageNumber, int pageSize) throws UnknownException {
+    public Collection<T> allFieldsJoinFilter(String joinTable, String mapFilter, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select base from"));
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
-        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
-        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join "+fetch+" base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+        String fetch = joinTable.split(":")[2] != null ? joinTable.split(":")[2] : "";
+        sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + fetch + " base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append("where 1=1"));
         sql.append(sharedUtil.append("and " + filterStringSelect(mapFilter).toString()));
         if (mapOrder != null) {
@@ -576,17 +576,17 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("select base from"));
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
-        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
+        String fetch = joinTable.split(":")[2] != null ? joinTable.split(":")[2] : "";
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + fetch + " base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilter).toString()));
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
-        }        
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         Collection<T> valores = query.list();
         return valores;
     }
-    
+
     @Override
     public Collection<T> allFieldsJoinFilterAnd(String joinTable, String[] mapFilter, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException {
         StringBuilder sql = new StringBuilder();
@@ -594,12 +594,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append("select base from"));
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
-        String fetch=joinTable.split(":")[2]!=null?joinTable.split(":")[2]:"";
+        String fetch = joinTable.split(":")[2] != null ? joinTable.split(":")[2] : "";
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + fetch + " base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilter).toString()));
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
-        }                
+        }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setFirstResult((pageNumber - 1) * pageSize);
         query.setMaxResults(pageSize);
@@ -622,9 +622,9 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Long count = (Long) query.uniqueResult();
         return count;
     }
-    
+
     @Override
-    public Object maxValueJoinFilterAnd(String field,String joinTable, String[] mapFilterField) throws UnknownException {
+    public Object maxValueJoinFilterAnd(String field, String joinTable, String[] mapFilterField) throws UnknownException {
         StringBuilder sql = new StringBuilder();
         Shared sharedUtil = new Shared();
         sql.append(sharedUtil.append("select").append("max(").append(field).append(")").append(sharedUtil.append("from")));
@@ -637,7 +637,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Query query = getCurrentSession().createQuery(sql.toString());
         return query.uniqueResult();
     }
-    
+
     @Override
     public Long rowCountJoinsFilterAnd(String[] joinTables, String[] mapFilterField) throws UnknownException {
         StringBuilder sql = new StringBuilder();
@@ -683,7 +683,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setFirstResult((pageNumber - 1) * pageSize);
@@ -692,7 +692,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Collection valores = query.getResultList();
         return valores;
     }
-    
+
     @Override
     public Collection<T> customFieldsJoinFilterAnd(String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException {
         StringBuilder sql = new StringBuilder();
@@ -701,16 +701,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
         for (String joinTable : joinTables) {
-            String entityFk=joinTable.split(":")[1];
-            if(entityFk.contains(".")){
+            String entityFk = joinTable.split(":")[1];
+            if (entityFk.contains(".")) {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + entityFk + " " + entityFk.split("\\.")[1]));
-            }else{
+            } else {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + entityFk + " " + entityFk));
-            }            
-        }        
+            }
+        }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setFirstResult((pageNumber - 1) * pageSize);
@@ -744,7 +744,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(clazz));
@@ -762,7 +762,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(dto));
@@ -780,7 +780,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(rt);
@@ -796,23 +796,23 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
         for (String joinTable : joinTables) {
-            String entityFk=joinTable.split(":")[1];
-            if(entityFk.contains(".")){
+            String entityFk = joinTable.split(":")[1];
+            if (entityFk.contains(".")) {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + entityFk + " " + entityFk.split("\\.")[1]));
-            }else{
+            } else {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + entityFk + " " + entityFk));
-            }            
+            }
         }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(rt);
         Collection valores = query.getResultList();
         return valores;
     }
-    
+
     @Override
     public Collection<T> customFieldsJoinFilterAnd(String fields, String[] joinTables, String[] mapFilterField, String[] mapOrder) throws UnknownException {
         StringBuilder sql = new StringBuilder();
@@ -821,16 +821,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         sql.append(clazz.getName());
         sql.append(sharedUtil.append("as base"));
         for (String joinTable : joinTables) {
-            String entityFk=joinTable.split(":")[1];
-            if(entityFk.contains(".")){
+            String entityFk = joinTable.split(":")[1];
+            if (entityFk.contains(".")) {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + entityFk + " " + entityFk.split("\\.")[1]));
-            }else{
+            } else {
                 sql.append(sharedUtil.append(joinTable.split(":")[0] + " join base." + entityFk + " " + entityFk));
-            }            
+            }
         }
         sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilterField).toString()));
         if (mapOrder != null) {
-        sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
         Query query = getCurrentSession().createQuery(sql.toString());
         query.setResultTransformer(Transformers.aliasToBean(clazz));
@@ -953,141 +953,150 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     private StringBuilder filterStringSelect(String mapFilterField) {
         StringBuilder pre = new StringBuilder();
         Shared sharedUtil = new Shared();
-        switch (mapFilterField.split(":")[0]) {
+        String[] mapFilterFieldsValues = mapFilterField.split(":");
+        switch (mapFilterFieldsValues[0]) {
             case ">":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append(">"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "<":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("<"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case ">=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append(">="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "<=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("<="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "equal":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("="));
-                pre.append(sharedUtil.append("\'" + mapFilterField.split(":")[2] + "\'"));
+                pre.append(sharedUtil.append("\'" + mapFilterFieldsValues[2] + "\'"));
                 break;
             case "notequal":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("!="));
-                pre.append(sharedUtil.append("\'" + mapFilterField.split(":")[2] + "\'"));
+                pre.append(sharedUtil.append("\'" + mapFilterFieldsValues[2] + "\'"));
                 break;
             case "!=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("!="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "like":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("like"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "between":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("between"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 pre.append(sharedUtil.append("and"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[3]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[3]));
                 break;
             case "in":
-                String valuesIn = "";
-                for (int i = 2; i < mapFilterField.split(":").length; i++) {
-                    valuesIn = valuesIn + mapFilterField.split(":")[i];
-                }
+
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("in"));
                 pre.append(sharedUtil.append("("));
-                pre.append(sharedUtil.append(valuesIn.replaceAll(":", ",")));
+                pre.append(sharedUtil.append(valuesByComas(2,mapFilterFieldsValues)));
                 pre.append(sharedUtil.append(")"));
                 break;
             case "isnull":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("is null"));
                 break;
             case "isnotnull":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("is not null"));
                 break;
         }
         return pre;
     }
 
+    private String valuesByComas(int init,String[] mapFilterFieldsValues) {
+        String valuesIn = "";
+        int valueControl = mapFilterFieldsValues.length - 1;
+        for (int i = init; i < mapFilterFieldsValues.length; i++) {
+            valuesIn = valuesIn + mapFilterFieldsValues[i] + (i < valueControl ? "," : "");
+        }
+        return valuesIn;
+    }
+
     private StringBuilder filterString(String mapFilterField) {
         StringBuilder pre = new StringBuilder();
         Shared sharedUtil = new Shared();
-        switch (mapFilterField.split(":")[0]) {
+        String[] mapFilterFieldsValues = mapFilterField.split(":");
+        switch (mapFilterFieldsValues[0]) {
             case "equal":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("="));
-                pre.append(sharedUtil.append("\'"+mapFilterField.split(":")[2]+"\'"));
+                pre.append(sharedUtil.append("\'" + mapFilterFieldsValues[2] + "\'"));
                 break;
             case "notequal":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("!="));
-                pre.append(sharedUtil.append("\'"+mapFilterField.split(":")[2]+"\'"));
+                pre.append(sharedUtil.append("\'" + mapFilterFieldsValues[2] + "\'"));
                 break;
             case ">":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append(">"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "<":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("<"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case ">=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append(">="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "<=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("<="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "!=":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("!="));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "like":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("like"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 break;
             case "between":
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 pre.append(sharedUtil.append("between"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[2]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[2]));
                 pre.append(sharedUtil.append("and"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[3]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[3]));
                 break;
             case "in":
                 String valuesIn = "";
-                for (int i = 2; i < mapFilterField.split(":").length; i++) {
-                    valuesIn = valuesIn + mapFilterField.split(":")[i];
+                for (int i = 2; i < mapFilterFieldsValues.length; i++) {
+                    valuesIn = valuesIn + mapFilterFieldsValues[i];
                 }
                 pre.append(sharedUtil.append("in"));
                 pre.append(sharedUtil.append("("));
@@ -1096,12 +1105,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
                 break;
             case "isnull":
                 pre.append(sharedUtil.append("is null"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
                 break;
             case "isnotnull":
                 pre.append(sharedUtil.append("is not null"));
-                pre.append(sharedUtil.append(mapFilterField.split(":")[1]));
-                break;                
+                pre.append(sharedUtil.append(mapFilterFieldsValues[1]));
+                break;
         }
         return pre;
     }
@@ -1109,50 +1118,51 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     private Predicate filterString(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root,
             String mapFilterField) {
         Predicate pre = null;
-        switch (mapFilterField.split(":")[0]) {
+        String[] mapFilterFieldsValues = mapFilterField.split(":");
+        switch (mapFilterFieldsValues[0]) {
             case ">":
-                pre = build.gt(root.get(mapFilterField.split(":")[1]), Double.parseDouble(mapFilterField.split(":")[2]));
+                pre = build.gt(root.get(mapFilterFieldsValues[1]), Double.parseDouble(mapFilterFieldsValues[2]));
                 break;
             case "<":
-                pre = build.lt(root.get(mapFilterField.split(":")[1]), Double.parseDouble(mapFilterField.split(":")[2]));
+                pre = build.lt(root.get(mapFilterFieldsValues[1]), Double.parseDouble(mapFilterFieldsValues[2]));
                 break;
             case ">=":
-                pre = build.ge(root.get(mapFilterField.split(":")[1]), Double.parseDouble(mapFilterField.split(":")[2]));
+                pre = build.ge(root.get(mapFilterFieldsValues[1]), Double.parseDouble(mapFilterFieldsValues[2]));
                 break;
             case "<=":
-                pre = build.le(root.get(mapFilterField.split(":")[1]), Double.parseDouble(mapFilterField.split(":")[2]));
+                pre = build.le(root.get(mapFilterFieldsValues[1]), Double.parseDouble(mapFilterFieldsValues[2]));
                 break;
             case "=":
-                pre = build.equal(root.get(mapFilterField.split(":")[1]), Double.parseDouble(mapFilterField.split(":")[2]));
+                pre = build.equal(root.get(mapFilterFieldsValues[1]), Double.parseDouble(mapFilterFieldsValues[2]));
                 break;
             case "like":
-                pre = build.like(root.get(mapFilterField.split(":")[1]), mapFilterField.split(":")[2]);
+                pre = build.like(root.get(mapFilterFieldsValues[1]), mapFilterFieldsValues[2]);
                 break;
             case "between":
-                pre = build.between(root.get(mapFilterField.split(":")[1]),
-                        Double.parseDouble(mapFilterField.split(":")[2]), Double.parseDouble(mapFilterField.split(":")[3]));
+                pre = build.between(root.get(mapFilterFieldsValues[1]),
+                        Double.parseDouble(mapFilterFieldsValues[2]), Double.parseDouble(mapFilterFieldsValues[3]));
                 break;
             case "in":
                 Collection inValue = new ArrayList();
-                for (int i = 2; i < mapFilterField.split(":").length; i++) {
-                    inValue.add(mapFilterField.split(":")[i]);
+                for (int i = 2; i < mapFilterFieldsValues.length; i++) {
+                    inValue.add(mapFilterFieldsValues[i]);
                 }
-                pre = root.get(mapFilterField.split(":")[1]).in(inValue);
+                pre = root.get(mapFilterFieldsValues[1]).in(inValue);
                 break;
             case "isnull":
-                pre = build.isNull(root.get(mapFilterField.split(":")[1]));
+                pre = build.isNull(root.get(mapFilterFieldsValues[1]));
                 break;
             case "isnotnull":
-                pre = build.isNotNull(root.get(mapFilterField.split(":")[1]));
+                pre = build.isNotNull(root.get(mapFilterFieldsValues[1]));
                 break;
             case "istrue":
-                pre = build.isTrue(root.get(mapFilterField.split(":")[1]));
+                pre = build.isTrue(root.get(mapFilterFieldsValues[1]));
                 break;
             case "isfalse":
-                pre = build.isFalse(root.get(mapFilterField.split(":")[1]));
+                pre = build.isFalse(root.get(mapFilterFieldsValues[1]));
                 break;
             case "equal":
-                pre = build.equal(root.get(mapFilterField.split(":")[1]), mapFilterField.split(":")[2]);
+                pre = build.equal(root.get(mapFilterFieldsValues[1]), mapFilterFieldsValues[2]);
                 break;
         }
         return pre;
@@ -1200,7 +1210,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     @Override
-    public int saveNativeQuery(String table, String[] fieldValues)throws UnknownException {
+    public int saveNativeQuery(String table, String[] fieldValues) throws UnknownException {
         StringBuilder builder = new StringBuilder();
         Shared sharedUtil = new Shared();
         builder.append(sharedUtil.append("INSERT INTO "));
@@ -1233,8 +1243,8 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         int value = query.executeUpdate();
         return value;
     }
-            
-    public int iudNativeQuery(String sql)throws UnknownException { 
+
+    public int iudNativeQuery(String sql) throws UnknownException {
         NativeQuery query = this.getCurrentSession().createNativeQuery(sql);
         int value = query.executeUpdate();
         return value;
@@ -1263,12 +1273,12 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     @Override
     public Session getSession() {
         return sessionFactory.getCurrentSession();
-    }   
-    
+    }
+
     @Override
     public Session getNewSession() {
         return sessionFactory.openSession();
-    }   
+    }
 
     private void executeStatement(Connection cnctn, String sql, Shared sharedUtil, ArrayNode array, Long limit, Long offset) throws SQLException {
         PreparedStatement ps = null;
@@ -1285,7 +1295,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             while (rs.next()) {
                 ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
                 for (int i = 1; i <= size; i++) {
-                    typesSet(node, rs, metadata, i);                    
+                    typesSet(node, rs, metadata, i);
                 }
                 array.add(node);
             }
