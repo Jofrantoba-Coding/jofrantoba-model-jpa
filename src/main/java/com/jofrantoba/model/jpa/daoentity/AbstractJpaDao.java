@@ -1243,9 +1243,25 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         int value = query.executeUpdate();
         return value;
     }
-
+        
     public int iudNativeQuery(String sql) throws UnknownException {
-        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);
+        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);        
+        int value = query.executeUpdate();
+        return value;
+    }  
+    
+    public int iudNativeQuery(String sql, String[] parametersValues) throws UnknownException {
+        Shared sharedUtil = new Shared();        
+        HashMap<String, Object> queryParam = new HashMap();
+        for (int i = 0; i < parametersValues.length; i++) {
+            queryParam.put(parametersValues[i].split(":")[0], sharedUtil.StringToObject(parametersValues[i].split(":")[1], parametersValues[i].split(":")[2]));
+        }
+        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);        
+        Iterator<String> iteradorKey = queryParam.keySet().iterator();
+        while (iteradorKey.hasNext()) {
+            String paramField = iteradorKey.next();
+            query.setParameter(paramField, queryParam.get(paramField));
+        }
         int value = query.executeUpdate();
         return value;
     }

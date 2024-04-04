@@ -26,7 +26,7 @@ public interface InterCrud<T extends Serializable> {
 
     void save(final T entity)throws UnknownException;
     
-    int saveNativeQuery(String table,String[] fieldValue)throws UnknownException;
+    int saveNativeQuery(String table,String[] fieldValue)throws UnknownException;        
     
     int iudNativeQuery(String sql)throws UnknownException;
 
