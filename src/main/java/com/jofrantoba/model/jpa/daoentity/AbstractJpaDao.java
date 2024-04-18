@@ -378,10 +378,10 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     }
 
     private void typesSet(ObjectNode node, ResultSet rs, ResultSetMetaData metadata, int i) throws SQLException {
-        log.error(metadata.getColumnLabel(i));
+        /*log.error(metadata.getColumnLabel(i));
         log.error(metadata.getColumnClassName(i));
         log.error(metadata.getColumnName(i));
-        log.error(metadata.getColumnTypeName(i));
+        log.error(metadata.getColumnTypeName(i));*/
         if (metadata.getColumnTypeName(i).equals("numeric")) {
             node.put(metadata.getColumnName(i), rs.getBigDecimal(metadata.getColumnName(i)));
         }
