@@ -76,6 +76,8 @@ public interface InterCrud<T extends Serializable> {
     
     Collection<T> allFieldsJoinFilterAnd(String joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException;
     
+    Collection<T> allFieldsJoinFilterAnd(String[] joinTable,String[] mapFilter, String[] mapOrder) throws UnknownException;
+    
     Collection<?> customFieldsJoinFilterAnd(Class<?> dto,String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;
     
     Collection<T> customFieldsJoinFilterAnd(String fields,String joinTable, String[] mapFilterField, String[] mapOrder) throws UnknownException;

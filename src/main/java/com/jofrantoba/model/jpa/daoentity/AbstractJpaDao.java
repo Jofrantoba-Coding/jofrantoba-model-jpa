@@ -586,6 +586,28 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         Collection<T> valores = query.list();
         return valores;
     }
+    
+    @Override
+    public Collection<T> allFieldsJoinFilterAnd(String[] joinTables, String[] mapFilter, String[] mapOrder) throws UnknownException {
+        StringBuilder sql = new StringBuilder();
+        Shared sharedUtil = new Shared();
+        sql.append(sharedUtil.append("select base from"));
+        sql.append(clazz.getName());
+        sql.append(sharedUtil.append("as base"));
+        String nameObjectParent="base";
+        for (String joinTable : joinTables) {
+            String fetch = joinTable.split(":")[2] != null ? joinTable.split(":")[2] : "";
+            sql.append(sharedUtil.append(joinTable.split(":")[0] + " join " + fetch +" "+nameObjectParent+"." + joinTable.split(":")[1] + " " + joinTable.split(":")[1]));
+            nameObjectParent=joinTable.split(":")[1];
+        }        
+        sql.append(sharedUtil.append(buildFilterStringSelect("and", mapFilter).toString()));
+        if (mapOrder != null) {
+            sql.append(sharedUtil.append(orderString(mapOrder).toString()));
+        }
+        Query query = getCurrentSession().createQuery(sql.toString());
+        Collection<T> valores = query.list();
+        return valores;
+    }
 
     @Override
     public Collection<T> allFieldsJoinFilterAnd(String joinTable, String[] mapFilter, String[] mapOrder, int pageNumber, int pageSize) throws UnknownException {
