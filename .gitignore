@@ -29,3 +29,6 @@ target/
 .factorypath
 .project
 .settings/
+
+ROADMAP_DETAILS.md
+.vscode/
