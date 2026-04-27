@@ -37,7 +37,7 @@ public class PSF {
             cfg.setProperties(cnxProperties.getProperties());
             for (String pack : packages) {
                 Reflections reflections = new Reflections(pack);
-                Set<Class<?>> classes = reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
+                Set<Class<?>> classes = reflections.getTypesAnnotatedWith(jakarta.persistence.Entity.class);
                 for (Class<?> clazz : classes) {
                     cfg.addAnnotatedClass(clazz);
                 }

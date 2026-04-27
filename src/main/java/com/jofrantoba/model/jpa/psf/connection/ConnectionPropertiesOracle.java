@@ -33,12 +33,12 @@ public class ConnectionPropertiesOracle extends AbstractConnectionProperties{
     @Override
     public Properties getProperties() {
         Properties props=new Properties();                
-        props.setProperty(Environment.DRIVER, super.getDriver());
-        props.setProperty(Environment.URL, super.getUrlConnection());
-        props.setProperty(Environment.USER, super.getUserDatabase());
-        props.setProperty(Environment.PASS, super.getPasswordDatabase());                
+        props.setProperty("jakarta.persistence.jdbc.driver", super.getDriver());
+        props.setProperty("jakarta.persistence.jdbc.url", super.getUrlConnection());
+        props.setProperty("jakarta.persistence.jdbc.user", super.getUserDatabase());        
+        props.setProperty("jakarta.persistence.jdbc.password", super.getPasswordDatabase());         
         //props.setProperty(Environment.DIALECT,"org.hibernate.dialect.Oracle12cDialect");                 
-        props.setProperty(Environment.DIALECT,"org.hibernate.dialect.Oracle10gDialect");                 
+        //props.setProperty(Environment.DIALECT,"org.hibernate.dialect.Oracle10gDialect");                 
         props.setProperty(Environment.SHOW_SQL,"true");                 
         props.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS,"thread");   
         props.setProperty("hibernate.connection.release_mode", "after_transaction");

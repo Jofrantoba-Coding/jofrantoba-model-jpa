@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.transform.ResultTransformer;
 
@@ -25,6 +26,10 @@ public interface InterCrud<T extends Serializable> {
     T findById(final String id)throws UnknownException;   
 
     void save(final T entity)throws UnknownException;
+
+    Long iudProcedureJson(String nameProcedure, String json) throws UnknownException;
+
+    List<T> listProcedureMsql(String nameProcedure, Map<String, Object> mapParameter) throws UnknownException;
     
     int saveNativeQuery(String table,String[] fieldValue)throws UnknownException;        
     

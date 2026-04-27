@@ -25,14 +25,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.StoredProcedureQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.query.NativeQuery;
@@ -75,6 +77,30 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     public void save(final T entity) {
         Preconditions.checkNotNull(entity);
         getCurrentSession().saveOrUpdate(entity);
+    }
+
+    @Override
+    public Long iudProcedureJson(String nameProcedure, String json) {
+        StoredProcedureQuery query = getCurrentSession()
+                .createStoredProcedureQuery(nameProcedure)
+                .registerStoredProcedureParameter("json", String.class, ParameterMode.IN)
+                .registerStoredProcedureParameter("count", Long.class, ParameterMode.OUT)
+                .setParameter("json", json);
+        query.execute();
+        Long count = (Long) query
+                .getOutputParameterValue("count");
+        return count;
+    }
+
+    @Override
+    public List<T> listProcedureMsql(String nameProcedure, Map<String, Object> mapParameter) {
+        //Query<T> query = getCurrentSession().createNativeQuery("EXEC ListParametriaFilter :id").addEntity(clazz);
+        Query<T> query = getCurrentSession().createNativeQuery(nameProcedure).addEntity(clazz);
+        //Query<T> query = getCurrentSession().createNativeQuery(nameProcedure, clazz);
+        for (Map.Entry<String, Object> entry : mapParameter.entrySet()) {
+            query.setParameter(entry.getKey(), entry.getValue());
+        }
+        return query.list();
     }
 
     @Override
@@ -1196,7 +1222,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     @Override
     public Map<Integer, Object[]> sqlExportTOExcel(String sql) throws UnknownException {
         Map<Integer, Object[]> data = new HashMap<Integer, Object[]>();
-        Query queryReport = this.getCurrentSession().createSQLQuery(sql);
+        Query queryReport = this.getCurrentSession().createNativeQuery(sql);
         List<Object[]> rows = queryReport.list();
         this.getCurrentSession().doWork(new Work() {
             @Override
