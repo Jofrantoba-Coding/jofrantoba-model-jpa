@@ -204,20 +204,20 @@ ORDER BY base.nombre ASC
 ### Ejemplo 4: Relaciones Jerárquicas
 
 ```java
-// En pg-icl-repository: obtener hijos de un padre específico
+// Obtener hijos de un nodo padre específico
 String joinTable = "left:parent";
 String[] filtros = {
-    "=:parent.id:5",                    // Parent ID = 5
-    "=:base.isPersistente:true"        // Y activos
+    "=:parent.id:5",              // Parent ID = 5
+    "=:base.active:true"          // Y activos
 };
-String fields = 
+String fields =
     "base.id as id, " +
-    "base.descripcion as descripcion, " +
-    "parent.id as idPadre, " +
-    "parent.descripcion as descripcionPadre";
-String[] orden = {"base.descripcion:asc"};
+    "base.name as name, " +
+    "parent.id as parentId, " +
+    "parent.name as parentName";
+String[] orden = {"base.name:asc"};
 
-Collection<Parametrias> hijos = dao.customFieldsJoinFilterAnd(
+Collection<Category> children = dao.customFieldsJoinFilterAnd(
     fields, joinTable, filtros, orden
 );
 ```
@@ -371,4 +371,4 @@ String[] orden = {
 ## 🔗 Ver También
 
 - [README.md](README.md) - Documentación completa
-- [pg-icl-repository/README.md](pg-icl-repository/README.md) - Ejemplos en producción
+- [Documentación web](https://jofrantoba.github.io/jofrantoba-model-jpa/dsl-guide) - Guía DSL online con ejemplos adicionales

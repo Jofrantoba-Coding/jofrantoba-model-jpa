@@ -1,8 +1,10 @@
-# jofrantoba-model-jpa
+﻿# jofrantoba-model-jpa
 
 Framework ORM genérico y flexible basado en **JPA/Hibernate 6** con soporte para múltiples motores de base de datos (MySQL, Oracle, PostgreSQL, SQL Server). Proporciona una arquitectura DAO robusta y reutilizable con operaciones complejas como JOINs, GROUP BY, paginación, procedimientos almacenados y consultas nativas.
 
 **Requisitos mínimos:** Java 17+ | **Versiones soportadas:** Java 17, 21 y superiores
+
+📚 **[Documentación completa en GitHub Pages](https://jofrantoba.github.io/jofrantoba-model-jpa)**
 
 ## 🎯 Características principales
 
@@ -339,315 +341,116 @@ public void consultaNativaSql() {
 }
 ```
 
-## � Ejemplos Reales: Sistema de Catastro (pg-icl-repository)
+## Ejemplo de Producción: Catálogo con árbol de categorías (PostgreSQL)
 
-El proyecto [pg-icl-repository](pg-icl-repository/README.md) es un caso de uso real y completo que implementa 60+ DAOs para un sistema catastral. Aquí están los ejemplos basados en ese módulo:
+Patrón completo para gestionar entidades jerárquicas (categorías, menús, configuraciones). Ver más ejemplos en la [documentación web](https://jofrantoba.github.io/jofrantoba-model-jpa/examples).
 
-### Ejemplo 1: Configuración con Spring Boot (ConfigDao)
+### Configuración Spring Boot
 
 ```java
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import com.jofrantoba.model.jpa.psf.PSF;
-import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesPostgre;
-import org.hibernate.SessionFactory;
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
-@ComponentScan(basePackages = {"gob.pe.icl.icl.dao"})
-public class ConfigDao {
+@ComponentScan(basePackages = {"com.example.myapp.dao"})
+public class DaoConfig {
 
-    private static SessionFactory sesionFactory = null;
-    public static boolean isSessionFactoryInicializado = false;
+    private static SessionFactory sessionFactory;
 
     @Bean(name = "sessionFactory")
     public SessionFactory getSessionFactory() {
-        try {
-            if (!isSessionFactoryInicializado && sesionFactory == null) {
-                List<String> packages = new ArrayList();
-                packages.add("gob.pe.icl.icl.entity");  // Paquete con entidades
-                
-                PSF.getInstance().buildPSF(
-                    "postgre",  // Clave para cachear SessionFactory
-                    new ConnectionPropertiesPostgre(
-                        "localhost",       // host
-                        5432,              // puerto
-                        "catastro_db",     // database
-                        "postgres",        // usuario
-                        "contraseña"       // contraseña
-                    ),
-                    packages
-                );
-                
-                sesionFactory = PSF.getInstance().getPSF("postgre");
-                isSessionFactoryInicializado = true;
-            }
-        } catch (Exception ex) {
-            log.error("SessionFactory no puede inicializarse: {}", ex.getMessage());
+        if (sessionFactory == null) {
+            PSF.getInstance().buildPSF(
+                "main",
+                new ConnectionPropertiesPostgre(
+                    "localhost", 5432, "myapp_db", "user", "password"
+                ),
+                List.of("com.example.myapp.entity")
+            );
+            sessionFactory = PSF.getInstance().getPSF("main");
         }
-        return sesionFactory;
+        return sessionFactory;
     }
 }
 ```
 
-### Ejemplo 2: Patrón DAO + Interfaz (DaoParametrias)
+### Entidad jerárquica (self-reference)
 
-**Entidad JPA:**
 ```java
 @Entity
-@Table(name = "tm_parametrias")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Parametrias implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name = "categories")
+@Data @NoArgsConstructor @AllArgsConstructor
+public class Category implements Serializable {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
-    private String descripcion;
+    @Column(nullable = false, length = 200)
+    private String name;
 
-    @Column(length = 50)
-    private String abreviatura;
+    @Column(length = 20)
+    private String code;
 
-    @Column(length = 50)
-    private String codigo;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Parametrias parent;
+    @ManyToOne @JoinColumn(name = "parent_id")
+    private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Parametrias> childrens = new ArrayList<>();
+    private List<Category> children = new ArrayList<>();
 
-    @Column(name = "is_persistente")
-    private Boolean isPersistente = true;
-
-    @Column(name = "version")
-    private Long version;
+    @Column private Boolean active = true;
 }
 ```
 
-**Interfaz personalizada:**
-```java
-import com.jofrantoba.model.jpa.daoentity.InterCrud;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+### DAO con operaciones de árbol
 
-public interface InterDaoParametrias extends InterCrud<Parametrias> {
-    Collection<Parametrias> parents() throws Exception;
-    Collection<Parametrias> parents(int pageNumber, int pageSize) throws Exception;
-    Collection<Parametrias> childrens() throws Exception;
-    Collection<Parametrias> childrensByParents(Long idParent) throws Exception;
-    Long countChildrens(Long idParent) throws Exception;
-    ArrayNode listar(Long limit, Long offset) throws Exception;
-}
-```
-
-**Implementación DAO:**
 ```java
 @Repository
-public class DaoParametrias extends AbstractJpaDao<Parametrias> 
-    implements InterDaoParametrias {
+public class CategoryDao extends AbstractJpaDao<Category> implements ICategoryDao {
 
-    @Autowired(required = false)
-    @Qualifier("sessionFactory")
+    @Autowired(required = false) @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
     @PostConstruct
     public void init() {
-        if (this.getSessionFactory() == null && sessionFactory != null) {
-            this.setSessionFactory(sessionFactory);
-        }
+        if (getSessionFactory() == null && sessionFactory != null)
+            setSessionFactory(sessionFactory);
     }
 
-    public DaoParametrias() {
-        super();
-        this.setClazz(Parametrias.class);
-    }
+    public CategoryDao() { super(); setClazz(Category.class); }
 
-    // Obtener todos los padres (registros sin parent_id)
     @Override
-    public Collection<Parametrias> parents() throws Exception {
-        String joinTable = "left:parent";
-        String[] mapFilterField = {
-            "isnull:parent.id",
-            "=:base.isPersistente:true"
-        };
-        String[] mapOrder = {"base.descripcion:asc"};
-        String fields = "base.id as id, base.descripcion as descripcion, " +
-                       "base.abreviatura as abreviatura, base.codigo as codigo";
-        
-        return this.customFieldsJoinFilterAnd(
-            fields, joinTable, mapFilterField, mapOrder
+    public Collection<Category> roots() throws Exception {
+        return customFieldsJoinFilterAnd(
+            "base.id as id, base.name as name, base.code as code",
+            "left:parent",
+            new String[]{"isnull:parent.id", "=:base.active:true"},
+            new String[]{"base.name:asc"}
         );
     }
 
-    // Obtener padres con paginación
     @Override
-    public Collection<Parametrias> parents(int pageNumber, int pageSize) throws Exception {
-        String joinTable = "left:parent";
-        String[] mapFilterField = {
-            "isnull:parent.id",
-            "=:base.isPersistente:true"
-        };
-        String[] mapOrder = {"base.descripcion:asc"};
-        String fields = "base.id as id, base.descripcion as descripcion";
-        
-        return this.customFieldsJoinFilterAnd(
-            fields, joinTable, mapFilterField, mapOrder, pageNumber, pageSize
+    public Collection<Category> childrenOf(Long parentId) throws Exception {
+        return customFieldsJoinFilterAnd(
+            "base.id as id, base.name as name, parent.id as parentId",
+            "left:parent",
+            new String[]{"=:parent.id:" + parentId, "=:base.active:true"},
+            new String[]{"base.name:asc"}
         );
     }
 
-    // Obtener todos los hijos (registros con parent_id no nulo)
     @Override
-    public Collection<Parametrias> childrens() throws Exception {
-        String joinTable = "left:parent";
-        String[] mapFilterField = {
-            "isnotnull:parent.id",
-            "=:base.isPersistente:true"
-        };
-        String fields = "base.id as id, base.descripcion as descripcion, " +
-                       "parent.id as idParent, parent.descripcion as descripcionParent";
-        
-        ResultTransformer rt = new ResultTransformer() {
-            @Override
-            public Object transformTuple(Object[] tuple, String[] aliases) {
-                Parametrias bean = new Parametrias();
-                bean.setTransformer(tuple, aliases);
-                return bean;
-            }
-
-            @Override
-            public List transformList(List list) {
-                return list;
-            }
-        };
-        
-        return this.customFieldsJoinFilterAnd(rt, fields, joinTable, 
-            mapFilterField, mapOrder);
-    }
-
-    // Obtener hijos de un padre específico
-    @Override
-    public Collection<Parametrias> childrensByParents(Long idParent) throws Exception {
-        String joinTable = "left:parent";
-        String[] mapFilterField = {
-            "=:parent.id:" + idParent,
-            "=:base.isPersistente:true"
-        };
-        String[] mapOrder = {"base.descripcion:asc"};
-        String fields = "base.id as id, base.descripcion as descripcion, " +
-                       "parent.id as idParent, parent.descripcion as descripcionParent";
-        
-        return this.customFieldsJoinFilterAnd(
-            fields, joinTable, mapFilterField, mapOrder
+    public Long countChildren(Long parentId) throws Exception {
+        return rowCountJoinFilterAnd(
+            "left:parent",
+            new String[]{"=:parent.id:" + parentId}
         );
     }
 
-    // Contar hijos de un padre
     @Override
-    public Long countChildrens(Long idParent) throws Exception {
-        String joinTable = "left:parent";
-        String[] mapFilterField = {
-            "=:parent.id:" + idParent,
-            "=:base.isPersistente:true"
-        };
-        
-        return this.rowCountJoinFilterAnd(joinTable, mapFilterField);
-    }
-
-    // Listar con limit y offset (retorna JSON)
-    @Override
-    public ArrayNode listar(Long limit, Long offset) throws Exception {
-        String table = "icl.catastro.tm_parametrias as base";
-        String fields = "base.id as id, base.descripcion as descripcion, " +
-                       "base.abreviatura as abreviatura, base.codigo as codigo";
-        String[] mapFilterField = {"=:base.is_persistente:true"};
-        String[] mapOrder = {"id:asc"};
-        
-        return this.allFieldsLimitOffsetPostgres(
-            table, fields, mapFilterField, mapOrder, limit, offset
+    public ArrayNode listPaged(Long limit, Long offset) throws Exception {
+        return allFieldsLimitOffsetPostgres(
+            "public.categories as base",
+            "base.id, base.name, base.code",
+            new String[]{"=:base.active:true"},
+            new String[]{"id:asc"},
+            limit, offset
         );
-    }
-}
-```
-
-### Ejemplo 3: Usando el DAO en un Servicio
-
-```java
-@Service
-public class ParametriasService {
-
-    @Autowired
-    private InterDaoParametrias daoParametrias;
-
-    // Crear nueva parametría padre
-    public void crearParametriaPadre(String descripcion, String abreviatura) {
-        Parametrias entity = new Parametrias();
-        entity.setDescripcion(descripcion);
-        entity.setAbreviatura(abreviatura);
-        entity.setIsPersistente(true);
-        entity.setVersion(System.currentTimeMillis());
-        
-        daoParametrias.save(entity);
-        log.info("✓ Parametría padre creada: {}", descripcion);
-    }
-
-    // Crear parametría hijo bajo un padre específico
-    public void crearParametriaHijo(Long idPadre, String descripcion) {
-        Parametrias padre = daoParametrias.findById(idPadre);
-        if (padre == null) {
-            throw new RuntimeException("Padre con ID " + idPadre + " no encontrado");
-        }
-
-        Parametrias hijo = new Parametrias();
-        hijo.setDescripcion(descripcion);
-        hijo.setParent(padre);
-        hijo.setIsPersistente(true);
-        hijo.setVersion(System.currentTimeMillis());
-        
-        daoParametrias.save(hijo);
-        log.info("✓ Parametría hijo creada bajo padre ID {}", idPadre);
-    }
-
-    // Obtener árbol jerárquico
-    public void mostrarArbolParametrias() {
-        try {
-            Collection<Parametrias> padres = daoParametrias.parents();
-            
-            padres.forEach(padre -> {
-                log.info("📦 Padre: {} (ID: {})", padre.getDescripcion(), padre.getId());
-                try {
-                    Collection<Parametrias> hijos = daoParametrias.childrensByParents(padre.getId());
-                    hijos.forEach(hijo -> 
-                        log.info("   └─ Hijo: {} (ID: {})", hijo.getDescripcion(), hijo.getId())
-                    );
-                } catch (Exception e) {
-                    log.error("Error al obtener hijos: {}", e.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            log.error("Error: {}", e.getMessage());
-        }
-    }
-
-    // Listar con paginación
-    public void listarConPaginacion(int pagina, int registrosPorPagina) {
-        try {
-            ArrayNode resultado = daoParametrias.listar(
-                (long) registrosPorPagina,
-                (long) (pagina - 1) * registrosPorPagina
-            );
-            log.info("Página {}: {} registros\n{}", 
-                pagina, resultado.size(), resultado.toPrettyString());
-        } catch (Exception e) {
-            log.error("Error en paginación: {}", e.getMessage());
-        }
     }
 }
 ```
@@ -938,10 +741,10 @@ SessionFactory sf = PSF.getInstance().buildPSF("sqlserver_prod", config,
 
 ---
 
-## 🔗 Proyectos Relacionados
+## 🔗 Recursos
 
-- **[pg-icl-repository](pg-icl-repository/README.md)** - Sistema de Catastro Digital con 60+ DAOs en producción, implementa todos los patrones del framework
-- **[jofrantoba-model-jpa-tests](https://github.com)** - Suite completa de tests para MySQL, PostgreSQL, Oracle, SQL Server
+- **[Documentación web](https://jofrantoba.github.io/jofrantoba-model-jpa)** - Guía completa con ejemplos, referencia de API y DSL
+- **[jofrantoba-model-jpa en GitHub](https://github.com/jofrantoba/jofrantoba-model-jpa)** - Código fuente y tests
 
 ---
 
