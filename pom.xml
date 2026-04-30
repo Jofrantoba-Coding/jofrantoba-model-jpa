@@ -5,6 +5,30 @@
     <artifactId>jofrantoba-model-jpa</artifactId>
     <version>2.0.0</version>
     <packaging>jar</packaging>
+    <name>jofrantoba-model-jpa</name>
+    <description>Generic JPA/Hibernate 6 DAO toolkit with CRUD operations, DSL filters, HQL joins, native SQL helpers, stored procedures, and JSON-style ResultSet mapping.</description>
+    <url>https://jofrantoba-coding.github.io/jofrantoba-model-jpa/</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>jofrantoba-coding</id>
+            <name>Jofrantoba Coding</name>
+            <organization>Jofrantoba Coding</organization>
+            <organizationUrl>https://github.com/Jofrantoba-Coding</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa.git</connection>
+        <developerConnection>scm:git:https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa.git</developerConnection>
+        <url>https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa</url>
+        <tag>HEAD</tag>
+    </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>        
@@ -30,6 +54,9 @@
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
         <version.reflections>0.9.11</version.reflections>
         <version.mssql-jdbc>12.8.1.jre11</version.mssql-jdbc>
+        <version.maven-javadoc-plugin>3.8.0</version.maven-javadoc-plugin>
+        <version.maven-gpg-plugin>3.2.4</version.maven-gpg-plugin>
+        <version.central-publishing-maven-plugin>0.9.0</version.central-publishing-maven-plugin>
     </properties>
     <dependencies>                                                
         <dependency>
@@ -217,4 +244,57 @@
             </resource>
         </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${version.maven-javadoc-plugin}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <failOnError>false</failOnError>
+                            <detectJavaApiLink>false</detectJavaApiLink>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${version.maven-gpg-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${version.central-publishing-maven-plugin}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>false</autoPublish>
+                            <waitForPublishCompletion>true</waitForPublishCompletion>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
