@@ -15,7 +15,7 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 
 | Feature | Details |
 |---------|---------|
-| Generic DAO | `AbstractJpaDao<T>` works for any JPA entity |
+| Generic DAO | `AbstractJpaDaoV2<T>` works for any JPA entity and parameterizes DSL filter values |
 | CRUD | save, update, delete, findById — numeric and string PKs |
 | Dynamic queries | DSL filters, JOINs, GROUP BY, ORDER BY, pagination |
 | Stored procedures | Input/output parameters, JSON-based calling convention |

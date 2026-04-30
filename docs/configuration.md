@@ -193,13 +193,14 @@ public class DaoConfig {
 **DAO auto-wired with Spring:**
 
 ```java
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import jakarta.annotation.PostConstruct;
 
 @Repository
-public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
 
     @Autowired(required = false)
     @Qualifier("sessionFactory")

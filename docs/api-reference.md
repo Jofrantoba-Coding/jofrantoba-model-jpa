@@ -15,14 +15,15 @@ nav_order: 5
 
 ---
 
-## AbstractJpaDao\<T\>
+## AbstractJpaDaoV2\<T\>
 
-`com.jofrantoba.model.jpa.daoentity.AbstractJpaDao<T extends Serializable>`
+`com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2<T extends Serializable>`
 
 Generic base class for all DAOs. Extend it and call `setClazz(YourEntity.class)` in the constructor.
+`AbstractJpaDaoV2` is the preferred implementation for new code because DSL filter values are bound as parameters and native join metadata is validated.
 
 ```java
-public class ProductDao extends AbstractJpaDao<Product> {
+public class ProductDao extends AbstractJpaDaoV2<Product> {
     public ProductDao() { setClazz(Product.class); }
 }
 ```
@@ -87,8 +88,25 @@ All methods below accept DSL string arrays. See the [DSL Guide](dsl-guide) for s
 |--------|-------------|
 | `allFieldsJoinPostgres(joins, table, fields, filters, order, logicOp)` | Multiple JOINs → JSON |
 | `allFieldsJoinPostgresGroupBy(joins, table, fields, filters, order, groupBy)` | GROUP BY → JSON |
+| `allFieldsJoinPostgresGroupBySubQuery(fields, groupBy, order, joinsSq, tableSq, fieldsSq, filtersSq, groupBySq)` | Subquery + GROUP BY → JSON |
 | `allFieldsLimitOffsetPostgres(table, fields, filters, order, limit, offset)` | Limit/offset pagination → JSON |
-| `allFieldsJoinPostgresCount(joins, table, fields, filters)` | COUNT → JSON |
+
+### Native JOIN contract
+
+`joinTables` for native relational methods uses a colon-based contract:
+
+```java
+String[] joinTables = {
+    "inner:jofrantoba.catastro.tm_distrito as distrito:on:base.id_distrito:distrito.id",
+    "left:(select * from jofrantoba.catastro.tm_via where is_persistente=true) as via:on:base.id_via:via.id",
+    "left:jofrantoba.catastro.tgv_interior as interior:on:interior.id_numeracion:numeracion.id:and:interior.id_unidad_catastral:base.id"
+};
+```
+
+Allowed join types are `left`, `inner`, `right`, `cross`, and `full`.
+Normal table references must be `schema.table` or `schema.table as alias`. Subqueries are accepted only for trusted internal SQL.
+
+`table`, `fields`, `groupBy`, and subquery bodies are SQL structure, not bindable values. Keep them as constants or server-side configuration, never as raw user input.
 
 ---
 
@@ -96,8 +114,9 @@ All methods below accept DSL string arrays. See the [DSL Guide](dsl-guide) for s
 
 | Method | Description |
 |--------|-------------|
-| `iudNativeQuery(sql)` | Execute INSERT/UPDATE/DELETE native SQL |
-| `saveNativeQuery(sql)` | Execute native INSERT returning generated key |
+| `iudNativeQuery(sql)` | Execute trusted internal INSERT/UPDATE/DELETE native SQL |
+| `iudNativeQuery(sql, parametersValues)` | Execute native SQL with named parameters supplied separately |
+| `saveNativeQuery(table, fieldValues)` | Execute native INSERT with validated identifiers and bound values |
 | `findCollectionByNativeQuery(sql)` | SELECT native SQL → `List<T>` |
 | `findCollectionByHql(hql)` | Execute arbitrary HQL |
 

@@ -62,7 +62,7 @@ public class Employee implements Serializable {
 ```java
 package com.example.hr.dao;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
 import com.jofrantoba.model.jpa.daoentity.InterCrud;
 import com.example.hr.entity.Employee;
 import java.util.Collection;
@@ -72,7 +72,7 @@ public interface IEmployeeDao extends InterCrud<Employee> {
     Collection<Employee> findActive(int page, int size) throws Exception;
 }
 
-public class EmployeeDao extends AbstractJpaDao<Employee> implements IEmployeeDao {
+public class EmployeeDao extends AbstractJpaDaoV2<Employee> implements IEmployeeDao {
 
     public EmployeeDao() { setClazz(Employee.class); }
 
@@ -224,7 +224,7 @@ public interface ICategoryDao extends InterCrud<Category> {
     ArrayNode listPaged(Long limit, Long offset) throws Exception;
 }
 
-public class CategoryDao extends AbstractJpaDao<Category> implements ICategoryDao {
+public class CategoryDao extends AbstractJpaDaoV2<Category> implements ICategoryDao {
 
     public CategoryDao() { setClazz(Category.class); }
 
@@ -350,15 +350,17 @@ public class Order implements Serializable {
 
 ```java
 // Report: orders with customer name and total
-String table  = "orders as base";
+String table  = "jofrantoba.sales.orders as base";
 String fields = "base.id as orderId, c.name as customer, " +
                 "base.status, base.total_amount as total";
-String[] joins   = {"INNER:customers c:base.customer_id = c.id"};
+String[] joins   = {
+    "inner:jofrantoba.sales.customers as c:on:base.customer_id:c.id"
+};
 String[] filters = {"equal:base.status:CLOSED"};
 String[] order   = {"base.total_amount:desc"};
 
 ArrayNode result = orderDao.allFieldsJoinPostgres(
-    joins, table, fields, filters, order, "AND"
+    joins, table, fields, filters, order, "and"
 );
 System.out.println(result.toPrettyString());
 ```
@@ -366,7 +368,7 @@ System.out.println(result.toPrettyString());
 ### GROUP BY — revenue by status
 
 ```java
-String table   = "orders as base";
+String table   = "jofrantoba.sales.orders as base";
 String fields  = "base.status, COUNT(*) as qty, SUM(base.total_amount) as revenue";
 String[] joins    = {};
 String[] filters  = {"isnotnull:base.created_at"};
@@ -430,7 +432,7 @@ public class DaoConfig {
 
 // ProductDao.java
 @Repository
-public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
 
     @Autowired @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;

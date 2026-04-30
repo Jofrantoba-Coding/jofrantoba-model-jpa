@@ -109,12 +109,15 @@ String fields =
 
 ---
 
-## JOIN syntax
+## HQL JOIN syntax
+
+Use this format with HQL/entity methods such as `customFieldsJoinFilterAnd`, `allFieldsJoinFilterAnd`, and `rowCountJoinFilterAnd`.
 
 ### Single JOIN
 
 ```java
 String joinTable = "left:department";    // LEFT JOIN department
+String joinFetch = "inner:customer:fetch";
 ```
 
 ### Multiple JOINs
@@ -135,6 +138,49 @@ String[] joinTables = {
 
 ---
 
+## Native JOIN syntax
+
+Use this format with native relational methods such as `allFieldsJoinPostgres`, `allFieldsJoinLimitOffsetPostgres`, and the `*GroupBySubQuery` variants.
+
+```java
+String[] joinTables = {
+    "inner:jofrantoba.catastro.tm_distrito as distrito:on:base.id_distrito:distrito.id",
+    "inner:jofrantoba.catastro.tm_provincia as provincia:on:distrito.id_provincia:provincia.id",
+    "left:(select * from jofrantoba.catastro.tm_via where is_persistente=true) as via:on:base.id_via:via.id"
+};
+```
+
+Multiple join conditions are expressed as additional colon-separated tokens:
+
+```java
+String[] joinTables = {
+    "left:jofrantoba.catastro.tgv_interior as interior:on:interior.id_numeracion:numeracion.id:and:interior.id_unidad_catastral:base.id"
+};
+```
+
+Valid native join types are `left`, `inner`, `right`, `cross`, and `full`.
+Normal table references must use `schema.table` or `schema.table as alias`.
+Subqueries are allowed only for trusted internal SQL.
+
+---
+
+## SQL safety contract
+
+`AbstractJpaDaoV2` parameterizes DSL filter values, `limit`, and `offset`.
+It also validates filter/order identifiers, native join types, table references, and join condition identifiers.
+
+These fragments are SQL structure and cannot be bound as query parameters:
+
+- `table`
+- `fields`
+- `groupBy`
+- subquery bodies inside `joinTables`
+- raw SQL passed to `sqlExportTOExcel(sql)` or `iudNativeQuery(sql)`
+
+Keep those fragments as constants or server-side configuration. Do not build them from raw user input.
+
+---
+
 ## Methods that support the DSL
 
 ```java
@@ -147,7 +193,7 @@ dao.customFieldsJoinFilterAnd(fields, joinTable, filters, order)
 dao.customFieldsJoinFilterAnd(fields, joinTable, filters, order, pageNumber, pageSize)
 
 // Native PostgreSQL / relational queries (returns ArrayNode JSON)
-dao.allFieldsJoinPostgres(joins, table, fields, filters, order, "AND")
+dao.allFieldsJoinPostgres(joins, table, fields, filters, order, "and")
 dao.allFieldsJoinPostgresGroupBy(joins, table, fields, filters, order, groupBy)
 dao.allFieldsLimitOffsetPostgres(table, fields, filters, order, limit, offset)
 

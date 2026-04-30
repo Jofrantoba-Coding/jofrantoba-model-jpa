@@ -98,16 +98,16 @@ public interface IProductDao extends InterCrud<Product> {
 }
 ```
 
-**Implementation** — extends `AbstractJpaDao<T>`:
+**Implementation** — extends `AbstractJpaDaoV2<T>`:
 
 ```java
 package com.example.myapp.dao;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
 import com.example.myapp.entity.Product;
 import java.util.Collection;
 
-public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
 
     public ProductDao() {
         setClazz(Product.class);
