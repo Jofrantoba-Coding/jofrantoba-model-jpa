@@ -151,6 +151,10 @@ This maps to entity paths such as `base.category category`.
 Use native joins for table-based methods that return `ArrayNode`.
 These joins do not use JPA entity relationships; they use SQL table references and the explicit alias from `table`, usually `base`.
 
+The native methods are intentionally optimized for JSON results. Hibernate is used to obtain the current connection, but the query is executed with JDBC `PreparedStatement`; `AbstractJpaDaoV2` reads the `ResultSet` and writes each row directly to Jackson JSON nodes.
+
+Use this when a repository method is a read-only report/query endpoint and does not need managed JPA entities.
+
 ```java
 String[] joinTables = {
     "inner:jofrantoba.catalog.tm_category as category:on:base.id_category:category.id",
@@ -571,7 +575,7 @@ public Map<Integer, Object[]> exportActiveProducts() throws Exception {
 | Entity results with simple filters | `allFieldsFilterAnd`, `allFieldsFilterOr` |
 | DTO-like HQL projection | `customFieldsFilterAnd`, `customFieldsJoinFilterAnd` |
 | Entity relationship joins | HQL join methods with `"inner:relation"` |
-| Native table joins returning JSON | `allFieldsJoinPostgres` |
+| Native table joins returning JSON without entity hydration | `allFieldsJoinPostgres` |
 | Native joins with pagination | `allFieldsJoinLimitOffsetPostgres` |
 | Native aggregation | `allFieldsJoinPostgresGroupBy` |
 | Aggregation over a subquery | `allFieldsJoinPostgresGroupBySubQuery` |
@@ -585,6 +589,7 @@ public Map<Integer, Object[]> exportActiveProducts() throws Exception {
 
 - Values in `mapFilterField` are parameterized by `AbstractJpaDaoV2`.
 - `limit` and `offset` are bound as JDBC parameters.
+- Native `ArrayNode` methods use JDBC `PreparedStatement` + `ResultSet` and skip Hibernate entity hydration.
 - Native join types and join identifiers are validated.
 - `table`, `fields`, `groupBy`, and subquery bodies are SQL structure; keep them in repository code or trusted server configuration.
 - Do not pass raw request parameters into `table`, `fields`, `groupBy`, or raw SQL methods.

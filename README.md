@@ -21,6 +21,7 @@ Most enterprise persistence layers repeat the same patterns:
 - Dynamic filters from screens or reports.
 - HQL joins across entity relationships.
 - Native SQL joins for reporting-style result sets.
+- Direct JDBC/ResultSet execution for native JSON results without hydrating JPA entities.
 - Pagination with `limit` / `offset`.
 - `group by`, subqueries, and aggregate projections.
 - Stored procedure calls.
@@ -149,6 +150,9 @@ Collection<Product> rows = dao.customFieldsJoinFilterAnd(
 ## Native Relational Joins
 
 Use native joins when you need table-level SQL and `ArrayNode` results.
+These methods bypass Hibernate entity hydration for the result rows: `AbstractJpaDaoV2` executes the SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps each row directly to Jackson `ObjectNode` / `ArrayNode`.
+
+That is useful for high-volume reports, grids, exports, dashboards, and multi-table projections where creating managed JPA entities would add unnecessary overhead.
 
 ```java
 ArrayNode rows = dao.allFieldsJoinPostgres(
@@ -163,6 +167,16 @@ ArrayNode rows = dao.allFieldsJoinPostgres(
     "and"
 );
 ```
+
+The optimized native-to-JSON path is used by methods such as:
+
+- `allFieldsPostgres`
+- `allFieldsLimitOffsetPostgres`
+- `allFieldsJoinPostgres`
+- `allFieldsJoinLimitOffsetPostgres`
+- `allFieldsJoinPostgresGroupBy`
+- `allFieldsJoinPostgresGroupBySubQuery`
+- `allFieldsLimitJoinPostgresGroupBySubQuery`
 
 Native join format:
 

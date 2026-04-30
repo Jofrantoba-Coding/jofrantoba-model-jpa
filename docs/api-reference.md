@@ -82,6 +82,10 @@ All methods below accept DSL string arrays. See the [DSL Guide](dsl-guide) for s
 
 ### PostgreSQL / relational methods (returns `ArrayNode`)
 
+These methods are optimized for reporting-style reads. They do not hydrate managed Hibernate entities for each row. `AbstractJpaDaoV2` executes the native SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps the row values directly into Jackson `ObjectNode` instances collected in an `ArrayNode`.
+
+Use this path for high-volume grids, exports, dashboards, and multi-table projections where JSON output is the desired result and entity lifecycle management is unnecessary.
+
 | Method | Description |
 |--------|-------------|
 | `allFieldsJoinPostgres(joins, table, fields, filters, order, logicOp)` | Multiple JOINs → JSON |

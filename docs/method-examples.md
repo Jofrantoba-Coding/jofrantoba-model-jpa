@@ -540,6 +540,11 @@ Long count = dao.aggregateJoinFilterAndGroupBy(
 
 ## Native Relational Methods
 
+The methods in this section are the optimized native-to-JSON path.
+They use the current Hibernate session only to access the JDBC connection, then execute a `PreparedStatement`, read the `ResultSet`, and map rows directly into `ArrayNode`.
+
+Use them when the repository should return report/grid/export JSON and does not need managed JPA entities.
+
 ### allFieldsPostgres
 
 ```java

@@ -184,6 +184,9 @@ String[] joinTables = {
 ## Native JOIN syntax
 
 Use this format with native relational methods such as `allFieldsJoinPostgres`, `allFieldsJoinLimitOffsetPostgres`, and the `*GroupBySubQuery` variants.
+These methods use an optimized native-to-JSON path: Hibernate provides the JDBC connection, but the query runs through `PreparedStatement`, reads a `ResultSet`, and maps rows directly to `ArrayNode`.
+
+This avoids hydrating JPA entities and is intended for reports, dashboards, exports, and complex projections.
 
 ```java
 String[] joinTables = {
