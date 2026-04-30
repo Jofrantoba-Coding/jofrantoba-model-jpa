@@ -288,7 +288,7 @@ See [Database Configuration](https://jofrantoba-coding.github.io/jofrantoba-mode
 Build from source:
 
 ```bash
-git clone https://github.com/jofrantoba-coding/jofrantoba-model-jpa.git
+git clone https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa.git
 cd jofrantoba-model-jpa
 mvn clean install -DskipTests
 ```

@@ -40,7 +40,7 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 Build from source:
 
 ```bash
-git clone https://github.com/jofrantoba/jofrantoba-model-jpa.git
+git clone https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa.git
 cd jofrantoba-model-jpa
 mvn clean install -DskipTests
 ```
@@ -81,4 +81,4 @@ mvn clean install -DskipTests
 ## License
 
 MIT — free to use, modify and distribute.
-See [LICENSE](https://github.com/jofrantoba/jofrantoba-model-jpa/blob/master/LICENSE).
+See [LICENSE](https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa/blob/master/LICENSE).
