@@ -212,15 +212,40 @@ Subqueries are allowed only for trusted internal SQL.
 `AbstractJpaDaoV2` parameterizes DSL filter values, `limit`, and `offset`.
 It also validates filter/order identifiers, native join types, table references, and join condition identifiers.
 
-These fragments are SQL structure and cannot be bound as query parameters:
+### What is safe to accept from user input
 
-- `table`
-- `fields`
-- `groupBy`
-- subquery bodies inside `joinTables`
-- raw SQL passed to `sqlExportTOExcel(sql)` or `iudNativeQuery(sql)`
+| Parameter | Safe from user input? | Reason |
+|-----------|----------------------|--------|
+| DSL filter **values** — `"=:field:VALUE"` | ✅ Yes | Bound as JDBC/HQL named parameter |
+| `limit`, `offset` | ✅ Yes | Bound as JDBC parameter |
+| DSL filter **field names** — `"=:FIELD:value"` | ⚠️ Validated | Regex-checked (`schema.field` pattern); still use server-side constants |
+| `mapOrder` field names | ⚠️ Validated | Regex-checked + direction forced to `asc`/`desc`; still use server-side constants |
+| `fields` (SELECT clause) | ❌ No | Concatenated directly into SQL |
+| `table` | ❌ No | Concatenated directly into SQL |
+| `groupBy` | ❌ No | Concatenated directly into SQL |
+| `joinTables` | ❌ No | Join type and identifier tokens are validated, subquery bodies are not |
+| `sql` in `iudNativeQuery(sql)` | ❌ No | Executes raw SQL |
+| `sql` in `sqlExportTOExcel(sql)` | ❌ No | Executes raw SQL |
 
-Keep those fragments as constants or server-side configuration. Do not build them from raw user input.
+**Rule of thumb:** filter *values* can come from the user; SQL *structure* (table names, column lists, joins, subqueries) must come from server-side constants.
+
+---
+
+## Choosing the right method
+
+| Goal | Returns | Method family |
+|------|---------|---------------|
+| Fetch entity objects, AND filters | `Collection<T>` | `customFieldsFilterAnd`, `allFieldsFilterAnd` |
+| Fetch entity objects, OR filters | `Collection<T>` | `customFieldsFilterOr`, `allFieldsFilterOr` |
+| Entity objects + JOIN | `Collection<T>` | `customFieldsJoinFilterAnd`, `allFieldsJoinFilterAnd` |
+| Paginated entity objects | `Collection<T>` | Any of the above with `page, size` overload |
+| JSON results, native SQL (PostgreSQL) | `ArrayNode` | `allFieldsJoinPostgres`, `allFieldsLimitOffsetPostgres` |
+| JSON with GROUP BY | `ArrayNode` | `allFieldsJoinPostgresGroupBy` |
+| Paginated JSON | `ArrayNode` | `allFieldsLimitOffsetPostgres`, `allFieldsJoinLimitOffsetPostgres` |
+| COUNT | `Long` | `rowCountJoinFilterAnd`, `rowCountJoinsFilterAnd` |
+| MAX / aggregate | `Object` / `Long` | `maxValueJoinFilterAnd`, `aggregateJoinFilterAndGroupBy` |
+| Stored procedure | varies | `iudProcedureJson`, `listProcedureMsql` |
+| Native INSERT | `int` | `saveNativeQuery` |
 
 ---
 

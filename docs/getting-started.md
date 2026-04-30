@@ -169,11 +169,19 @@ public class DatabaseConfig {
 
 ## Step 5 — Use the DAO
 
+Every write operation (save, update, delete) requires an active Hibernate transaction.
+Choose the approach that matches your runtime:
+
+### Without Spring (plain Java / Jakarta EE)
+
+Open and commit a transaction explicitly for writes. Reads do not require an explicit transaction but still benefit from one.
+
 ```java
 package com.example.myapp.service;
 
 import com.example.myapp.dao.ProductDao;
 import com.example.myapp.entity.Product;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -188,13 +196,91 @@ public class ProductService {
     }
 
     public void create(Product product) {
-        product.setActive(true);
-        product.setCreatedAt(LocalDateTime.now());
-        dao.save(product);
+        Session session = dao.getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            product.setActive(true);
+            product.setCreatedAt(LocalDateTime.now());
+            dao.save(product);
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void update(Product product) {
+        Session session = dao.getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            dao.update(product);
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void delete(long id) {
+        Session session = dao.getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            dao.delete(id);
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public Product findById(long id) {
         return dao.findById(id);
+    }
+
+    public Collection<Product> listActive() throws Exception {
+        return dao.findActive();
+    }
+
+    public Collection<Product> search(String name) throws Exception {
+        // DSL filter values (name) are bound as parameters — safe to accept from user input.
+        // Never concatenate user input into fields, table, or groupBy arguments.
+        return dao.customFieldsFilterAnd(
+            "base.id, base.name, base.sku, base.price",
+            new String[]{"like:base.name:%" + name + "%", "=:base.active:true"},
+            new String[]{"base.name:asc"}
+        );
+    }
+}
+```
+
+### With Spring Boot
+
+Annotate the service class with `@Transactional`. Spring manages commit and rollback automatically.
+
+```java
+package com.example.myapp.service;
+
+import com.example.myapp.dao.ProductDao;
+import com.example.myapp.entity.Product;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.Collection;
+
+@Service
+@Transactional
+public class ProductService {
+
+    private final ProductDao dao;
+
+    public ProductService(ProductDao dao) {
+        this.dao = dao;
+    }
+
+    public void create(Product product) {
+        product.setActive(true);
+        product.setCreatedAt(LocalDateTime.now());
+        dao.save(product);
     }
 
     public void update(Product product) {
@@ -205,23 +291,21 @@ public class ProductService {
         dao.delete(id);
     }
 
+    public Product findById(long id) {
+        return dao.findById(id);
+    }
+
+    @Transactional(readOnly = true)
     public Collection<Product> listActive() throws Exception {
         return dao.findActive();
     }
 
+    @Transactional(readOnly = true)
     public Collection<Product> search(String name) throws Exception {
         return dao.customFieldsFilterAnd(
             "base.id, base.name, base.sku, base.price",
             new String[]{"like:base.name:%" + name + "%", "=:base.active:true"},
             new String[]{"base.name:asc"}
-        );
-    }
-
-    public Collection<Product> listPaged(int page, int size) throws Exception {
-        return dao.allFields(
-            new String[]{"=:base.active:true"},
-            new String[]{"base.name:asc"},
-            page, size
         );
     }
 }
