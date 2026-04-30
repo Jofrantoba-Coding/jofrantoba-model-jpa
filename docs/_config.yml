@@ -1,8 +1,8 @@
 title: jofrantoba-model-jpa
-description: Generic JPA/Hibernate 6 ORM Framework — multi-database, DSL query builder, stored procedures
+description: Generic JPA/Hibernate 6 ORM Framework - multi-database, DSL query builder, stored procedures
 remote_theme: just-the-docs/just-the-docs@v0.10.0
 
-url: https://jofrantoba.github.io
+url: https://jofrantoba-coding.github.io
 baseurl: /jofrantoba-model-jpa
 
 search_enabled: true

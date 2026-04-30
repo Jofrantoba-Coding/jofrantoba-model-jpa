@@ -6,12 +6,12 @@ Generic DAO toolkit for **JPA / Hibernate 6** applications. It provides a reusab
 
 Full documentation:
 
-- [Home](https://jofrantoba.github.io/jofrantoba-model-jpa)
-- [Getting Started](https://jofrantoba.github.io/jofrantoba-model-jpa/getting-started)
-- [DSL Guide](https://jofrantoba.github.io/jofrantoba-model-jpa/dsl-guide)
-- [API Reference](https://jofrantoba.github.io/jofrantoba-model-jpa/api-reference)
-- [Method Examples](https://jofrantoba.github.io/jofrantoba-model-jpa/method-examples)
-- [Repository Examples](https://jofrantoba.github.io/jofrantoba-model-jpa/repository-examples)
+- [Home](https://jofrantoba-coding.github.io/jofrantoba-model-jpa)
+- [Getting Started](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/getting-started)
+- [DSL Guide](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/dsl-guide)
+- [API Reference](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/api-reference)
+- [Method Examples](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/method-examples)
+- [Repository Examples](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/repository-examples)
 
 ## What This Library Solves
 
@@ -121,7 +121,7 @@ Common operators:
 | `in` | Multiple values |
 | `isnull` / `isnotnull` | Null checks |
 
-See the [DSL Guide](https://jofrantoba.github.io/jofrantoba-model-jpa/dsl-guide) for the full contract.
+See the [DSL Guide](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/dsl-guide) for the full contract.
 
 ## HQL Entity Joins
 
@@ -216,7 +216,7 @@ ArrayNode rows = dao.allFieldsJoinPostgresGroupBySubQuery(
 );
 ```
 
-For the full repository pattern, see [Repository Examples](https://jofrantoba.github.io/jofrantoba-model-jpa/repository-examples).
+For the full repository pattern, see [Repository Examples](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/repository-examples).
 
 ## SQL Safety Contract
 
@@ -273,7 +273,7 @@ Supported connection property classes:
 - `ConnectionPropertiesOracle`
 - `ConnectionPropertiesSqlServer`
 
-See [Database Configuration](https://jofrantoba.github.io/jofrantoba-model-jpa/configuration).
+See [Database Configuration](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/configuration).
 
 ## Maven
 
@@ -288,7 +288,7 @@ See [Database Configuration](https://jofrantoba.github.io/jofrantoba-model-jpa/c
 Build from source:
 
 ```bash
-git clone https://github.com/jofrantoba/jofrantoba-model-jpa.git
+git clone https://github.com/jofrantoba-coding/jofrantoba-model-jpa.git
 cd jofrantoba-model-jpa
 mvn clean install -DskipTests
 ```
@@ -297,11 +297,11 @@ mvn clean install -DskipTests
 
 | Page | Purpose |
 |------|---------|
-| [Getting Started](https://jofrantoba.github.io/jofrantoba-model-jpa/getting-started) | First DAO and database connection |
-| [DSL Guide](https://jofrantoba.github.io/jofrantoba-model-jpa/dsl-guide) | Full DSL contract |
-| [API Reference](https://jofrantoba.github.io/jofrantoba-model-jpa/api-reference) | Public methods and support classes |
-| [Method Examples](https://jofrantoba.github.io/jofrantoba-model-jpa/method-examples) | Example for each public method |
-| [Repository Examples](https://jofrantoba.github.io/jofrantoba-model-jpa/repository-examples) | Complex patterns from `.examples` |
+| [Getting Started](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/getting-started) | First DAO and database connection |
+| [DSL Guide](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/dsl-guide) | Full DSL contract |
+| [API Reference](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/api-reference) | Public methods and support classes |
+| [Method Examples](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/method-examples) | Example for each public method |
+| [Repository Examples](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/repository-examples) | Complex patterns from `.examples` |
 
 ## License
 
