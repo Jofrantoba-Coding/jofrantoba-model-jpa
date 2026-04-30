@@ -56,6 +56,7 @@ mvn clean install -DskipTests
 | [DSL Guide](dsl-guide) | Complete reference for the declarative query DSL |
 | [API Reference](api-reference) | All classes and methods |
 | [Examples](examples) | Full working patterns for real-world scenarios |
+| [Method Examples](method-examples) | Minimal usage example for each `AbstractJpaDaoV2` public method |
 
 ---
 

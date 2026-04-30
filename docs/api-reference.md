@@ -45,7 +45,6 @@ public class ProductDao extends AbstractJpaDaoV2<Product> {
 | `update(T entity)` | `void` | Merge (update) existing entity |
 | `delete(T entity)` | `void` | Remove entity object |
 | `delete(long id)` | `void` | Remove by numeric PK |
-| `delete(String id)` | `void` | Remove by string PK |
 | `findById(long id)` | `T` | Find by numeric PK |
 | `findById(String id)` | `T` | Find by string PK |
 | `allFields()` | `Collection<T>` | Fetch all rows |
@@ -61,16 +60,15 @@ All methods below accept DSL string arrays. See the [DSL Guide](dsl-guide) for s
 | Method | Description |
 |--------|-------------|
 | `customFieldsFilterAnd(fields, filters, order)` | SELECT with AND filters |
-| `customFieldsFilterAnd(fields, filters, order, page, size)` | Paginated version |
-| `findCollectionByFilterAnd(filters)` | Returns full entity objects |
-| `findCollectionByFilterAndPaginated(filters, page, size)` | Paginated full objects |
+| `allFieldsFilterAnd(filters, order)` | Returns full entity objects with AND filters |
+| `allFields(filter, order, page, size)` | Paginated full objects with one filter |
 
 ### OR filters (HQL-based)
 
 | Method | Description |
 |--------|-------------|
 | `customFieldsFilterOr(fields, filters, order)` | SELECT with OR filters |
-| `findCollectionByFilterOr(filters)` | Returns full entity objects |
+| `allFieldsFilterOr(filters, order)` | Returns full entity objects with OR filters |
 
 ### JOIN methods (HQL-based, single join)
 
@@ -117,8 +115,7 @@ Normal table references must be `schema.table` or `schema.table as alias`. Subqu
 | `iudNativeQuery(sql)` | Execute trusted internal INSERT/UPDATE/DELETE native SQL |
 | `iudNativeQuery(sql, parametersValues)` | Execute native SQL with named parameters supplied separately |
 | `saveNativeQuery(table, fieldValues)` | Execute native INSERT with validated identifiers and bound values |
-| `findCollectionByNativeQuery(sql)` | SELECT native SQL → `List<T>` |
-| `findCollectionByHql(hql)` | Execute arbitrary HQL |
+| `sqlExportTOExcel(sql)` | Execute trusted internal SELECT and return headers + rows for export |
 
 ---
 

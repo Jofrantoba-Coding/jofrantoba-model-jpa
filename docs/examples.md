@@ -87,8 +87,11 @@ public class EmployeeDao extends AbstractJpaDaoV2<Employee> implements IEmployee
 
     @Override
     public Collection<Employee> findActive(int page, int size) throws Exception {
-        return findCollectionByFilterAndPaginated(
-            new String[]{"=:base.active:true"}, page, size
+        return allFields(
+            "=:base.active:true",
+            new String[]{"base.fullName:asc"},
+            page,
+            size
         );
     }
 }
@@ -456,8 +459,9 @@ public class ProductService {
     public void create(Product p) { productDao.save(p); }
 
     public Collection<Product> active() throws Exception {
-        return productDao.findCollectionByFilterAnd(
-            new String[]{"=:base.active:true"}
+        return productDao.allFieldsFilterAnd(
+            new String[]{"=:base.active:true"},
+            new String[]{"base.name:asc"}
         );
     }
 }
@@ -496,8 +500,9 @@ public class ProductDaoTest {
 
     @Test
     void filterActive() throws Exception {
-        Collection<Product> list = dao.findCollectionByFilterAnd(
-            new String[]{"=:base.active:true"}
+        Collection<Product> list = dao.allFieldsFilterAnd(
+            new String[]{"=:base.active:true"},
+            new String[]{"base.name:asc"}
         );
         list.forEach(item -> assertTrue(item.getActive()));
     }

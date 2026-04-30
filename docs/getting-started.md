@@ -218,8 +218,9 @@ public class ProductService {
     }
 
     public Collection<Product> listPaged(int page, int size) throws Exception {
-        return dao.findCollectionByFilterAndPaginated(
+        return dao.allFields(
             new String[]{"=:base.active:true"},
+            new String[]{"base.name:asc"},
             page, size
         );
     }
