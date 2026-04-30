@@ -41,6 +41,49 @@ Collection<Product> results = dao.customFieldsFilterAnd(fields, filters, order);
 
 ---
 
+## Entity `T` and the `base` alias
+
+`AbstractJpaDaoV2<T>` always treats `T` as the root entity for HQL/entity methods.
+In those methods, the DAO builds queries using `base` as the alias for `T`.
+
+```java
+public class ProductDao extends AbstractJpaDaoV2<Product> {
+    public ProductDao() {
+        setClazz(Product.class);
+    }
+}
+
+Collection<Product> rows = dao.allFieldsFilterAnd(
+    new String[]{"=:base.active:true"},
+    new String[]{"base.name:asc"}
+);
+```
+
+For HQL methods, `base.active` and `base.name` are Java entity properties of `Product`, not database column names.
+HQL joins also start from `base`:
+
+```java
+String joinTable = "left:category";
+```
+
+This means:
+
+```sql
+from Product as base
+left join base.category category
+```
+
+For native SQL methods, `base` is not created from `T`. You must define it in the `table` argument:
+
+```java
+String table = "jofrantoba.catalog.products as base";
+String[] filters = {"=:base.active:true"};
+```
+
+If a native filter, field, join, order, or group uses `base.*`, then `table` must include `as base`.
+
+---
+
 ## Comparison operators
 
 ### Numeric / boolean

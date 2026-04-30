@@ -63,6 +63,28 @@ String[] nameOrder = {"base.name:asc"};
 
 ## DSL Language Quick Reference
 
+### Entity `T` and `base`
+
+`ProductDao extends AbstractJpaDaoV2<Product>` means `Product` is the root entity `T`.
+For HQL/entity methods, `base` is the alias of that entity:
+
+```java
+Collection<Product> rows = dao.allFieldsFilterAnd(
+    new String[]{"=:base.active:true"},
+    new String[]{"base.name:asc"}
+);
+```
+
+Here `active` and `name` are Java properties of `Product`.
+
+For native SQL methods, define `base` explicitly:
+
+```java
+String table = "jofrantoba.catalog.products as base";
+```
+
+Then `base.id`, `base.name`, and `base.active` are SQL columns or table aliases from the native query.
+
 ### Filters
 
 ```java

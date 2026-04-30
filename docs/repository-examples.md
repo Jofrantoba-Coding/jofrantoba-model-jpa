@@ -29,6 +29,30 @@ Every complex example follows the same structure:
 4. Public repository methods build DSL arrays: `fields`, `table`, `joinTables`, `mapFilterField`, `mapOrder`, `groupBy`.
 5. The repository delegates execution to inherited `AbstractJpaDaoV2` methods.
 
+`T` is the entity managed by the repository. For HQL/entity methods, `AbstractJpaDaoV2` uses `base` as the alias of that entity:
+
+```java
+public class DaoProduct extends AbstractJpaDaoV2<Product> {
+    public DaoProduct() {
+        setClazz(Product.class);
+    }
+}
+```
+
+So a filter like this refers to the `Product.active` Java property:
+
+```java
+new String[]{"=:base.active:true"}
+```
+
+For native SQL methods, `base` must be declared manually in the table string:
+
+```java
+String table = "jofrantoba.catalog.tgv_product as base";
+```
+
+All native `fields`, `joinTables`, `mapFilterField`, `mapOrder`, and `groupBy` entries that use `base.*` depend on that alias being present.
+
 ```java
 package com.jofrantoba.examples.catalog.dao.impl;
 
@@ -125,6 +149,7 @@ This maps to entity paths such as `base.category category`.
 ### Native Join DSL
 
 Use native joins for table-based methods that return `ArrayNode`.
+These joins do not use JPA entity relationships; they use SQL table references and the explicit alias from `table`, usually `base`.
 
 ```java
 String[] joinTables = {
