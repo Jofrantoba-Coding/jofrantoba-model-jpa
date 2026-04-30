@@ -15,7 +15,7 @@ nav_order: 3
 
 ---
 
-## PSF — SessionFactory cache
+## PSF - SessionFactory cache
 
 `PSF` is a singleton that creates and caches Hibernate `SessionFactory` instances by an arbitrary string key.
 A single application can hold multiple open factories (one per database).
@@ -33,9 +33,24 @@ PSF.getInstance().destroyPSF(key);
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `key` | `String` | Any unique identifier — e.g. `"postgres_main"` |
+| `key` | `String` | Any unique identifier - e.g. `"postgres_main"` |
 | `connectionProperties` | `ConnectionProperties` | Database-specific config object |
 | `packages` | `List<String>` | Java packages to scan for `@Entity` classes |
+
+---
+
+## RDBMS Compatibility
+
+Compatibility is defined by the JDBC drivers bundled in `pom.xml`. The DAO layer itself uses Hibernate/JPA and JDBC APIs; vendor-specific behavior comes from the selected dialect, driver, and the SQL you write in native-query methods.
+
+| Database | Bundled driver | Minimum database version by driver | Notes |
+|----------|----------------|------------------------------------|-------|
+| MySQL | `mysql:mysql-connector-java:8.0.28` | MySQL 5.7 | Also supports MySQL 8.0. TLS 1.0/1.1 are not valid with this driver version. |
+| PostgreSQL | `org.postgresql:postgresql:42.6.0` | PostgreSQL 8.4 | pgJDBC regression coverage is stronger from PostgreSQL 9.1 onward. |
+| Oracle Database | `com.oracle.database.jdbc:ojdbc6:11.2.0.4` | Oracle Database 11.2.0.4 | Oracle's compatibility matrix also covers 12.1, 12.2, 18.3 and 19.x for this driver line. For modern Java runtimes, consider overriding to a newer `ojdbc8`, `ojdbc11` or `ojdbc17` driver in the consuming app. |
+| SQL Server | `com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11` | SQL Server 2016 | Also supports SQL Server 2017, 2019, 2022, Azure SQL Database, Azure SQL Managed Instance and Azure Synapse according to Microsoft's support matrix. |
+
+These are driver-level minimums, not a guarantee that every custom native SQL string will run unchanged across all engines. Methods named `Postgres` return JSON through JDBC `ResultSet`, but their SQL syntax still needs to match the database where it is executed.
 
 ---
 
@@ -57,7 +72,8 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 );
 ```
 
-Driver version included: `mysql-connector-java:8.0.28`  
+Driver version included: `mysql-connector-java:8.0.28`
+Minimum database version by driver: MySQL 5.7
 Character set: `utf8mb4`
 
 ---
@@ -81,6 +97,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 ```
 
 Driver version included: `postgresql:42.6.0`
+Minimum database version by driver: PostgreSQL 8.4
 
 ---
 
@@ -103,6 +120,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 ```
 
 Driver version included: `ojdbc6:11.2.0.4`
+Minimum database version by driver: Oracle Database 11.2.0.4
 
 ---
 
@@ -125,6 +143,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 ```
 
 Driver version included: `mssql-jdbc:12.8.1.jre11`
+Minimum database version by driver: SQL Server 2016
 
 ---
 

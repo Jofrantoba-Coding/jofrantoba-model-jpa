@@ -16,11 +16,11 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 | Feature | Details |
 |---------|---------|
 | Generic DAO | `AbstractJpaDaoV2<T>` works for any JPA entity and parameterizes DSL filter values |
-| CRUD | save, update, delete, findById — numeric and string PKs |
+| CRUD | save, update, delete, findById - numeric and string PKs |
 | Dynamic queries | DSL filters, JOINs, GROUP BY, ORDER BY, pagination |
 | Stored procedures | Input/output parameters, JSON-based calling convention |
 | Native SQL / HQL | Auto-transforms results to `ArrayNode` JSON |
-| Multi-database | One config class per DB engine — no code changes needed |
+| Multi-database | One config class per DB engine - no code changes needed |
 | Connection pooling | C3P0, SessionFactory cached by key via `PSF` singleton |
 | Logging | SLF4J + Log4j2 2.21.1 |
 | Zero config | Entity auto-discovery via `@Entity` + reflection |
@@ -73,12 +73,12 @@ mvn clean install -DskipTests
 | Lombok | 1.18.32 |
 | Jackson | 2.17.1 |
 | C3P0 pool | 0.9.5.5 |
-| MySQL driver | 8.0.28 |
-| PostgreSQL driver | 42.6.0 |
-| Oracle JDBC | 11.2.0.4 |
-| SQL Server JDBC | 12.8.1 |
+| MySQL driver | 8.0.28 - MySQL 5.7+ |
+| PostgreSQL driver | 42.6.0 - PostgreSQL 8.4+ |
+| Oracle JDBC | 11.2.0.4 - Oracle Database 11.2.0.4+ |
+| SQL Server JDBC | 12.8.1 - SQL Server 2016+ |
 
 ## License
 
-MIT — free to use, modify and distribute.
+MIT - free to use, modify and distribute.
 See [LICENSE](https://github.com/Jofrantoba-Coding/jofrantoba-model-jpa/blob/master/LICENSE).

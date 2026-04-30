@@ -273,6 +273,15 @@ Supported connection property classes:
 - `ConnectionPropertiesOracle`
 - `ConnectionPropertiesSqlServer`
 
+Bundled driver compatibility:
+
+| Database | Driver | Minimum database version by driver |
+|----------|--------|------------------------------------|
+| MySQL | `mysql-connector-java:8.0.28` | MySQL 5.7 |
+| PostgreSQL | `postgresql:42.6.0` | PostgreSQL 8.4 |
+| Oracle Database | `ojdbc6:11.2.0.4` | Oracle Database 11.2.0.4 |
+| SQL Server | `mssql-jdbc:12.8.1.jre11` | SQL Server 2016 |
+
 See [Database Configuration](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/configuration).
 
 ## Maven

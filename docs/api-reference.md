@@ -195,8 +195,8 @@ All extend `AbstractConnectionProperties` and implement `ConnectionProperties`.
 | Class | Database | Default port |
 |-------|----------|-------------|
 | `ConnectionPropertiesMysql` | MySQL 5.7+ | 3306 |
-| `ConnectionPropertiesPostgre` | PostgreSQL 10+ | 5432 |
-| `ConnectionPropertiesOracle` | Oracle 11g+ | 1521 |
+| `ConnectionPropertiesPostgre` | PostgreSQL 8.4+ | 5432 |
+| `ConnectionPropertiesOracle` | Oracle Database 11.2.0.4+ | 1521 |
 | `ConnectionPropertiesSqlServer` | SQL Server 2016+ | 1433 |
 
 Constructor signature (all four):
