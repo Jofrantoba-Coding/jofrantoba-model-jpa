@@ -1,5 +1,6 @@
 package com.jofrantoba.model.jpa.daoentity.test.sqlserver.daoparametria;
 
+import com.jofrantoba.model.jpa.daoentity.test.sqlserver.daoparametria.*;
 import com.jofrantoba.model.jpa.daoentity.test.GlobalEntityPkNumeric;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

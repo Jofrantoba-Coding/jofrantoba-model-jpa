@@ -76,7 +76,7 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
     @Override
     public void save(final T entity) {
         Preconditions.checkNotNull(entity);
-        getCurrentSession().saveOrUpdate(entity);
+        getCurrentSession().merge(entity);
     }
 
     @Override
@@ -110,7 +110,7 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
     @Override
     public void delete(final T entity) {
         Preconditions.checkNotNull(entity);
-        getCurrentSession().delete(entity);
+        getCurrentSession().remove(entity);
     }
 
     @Override
@@ -582,11 +582,11 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query query = getCurrentSession().createQuery(sql.toString(),clazz);
         applyHqlParams(query, frag.params);
         query.setFirstResult((pageNumber - 1) * pageSize);
         query.setMaxResults(pageSize);
-        Collection<T> valores = query.list();
+        Collection<T> valores = query.getResultList();
         return valores;
     }
 
@@ -605,9 +605,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query query = getCurrentSession().createQuery(sql.toString(),clazz);
         applyHqlParams(query, frag.params);
-        Collection<T> valores = query.list();
+        Collection<T> valores = query.getResultList();
         return valores;
     }
 
@@ -630,9 +630,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query query = getCurrentSession().createQuery(sql.toString(),clazz);
         applyHqlParams(query, frag.params);
-        Collection<T> valores = query.list();
+        Collection<T> valores = query.getResultList();
         return valores;
     }
 
@@ -651,11 +651,11 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query query = getCurrentSession().createQuery(sql.toString(),clazz);
         applyHqlParams(query, frag.params);
         query.setFirstResult((pageNumber - 1) * pageSize);
         query.setMaxResults(pageSize);
-        Collection<T> valores = query.list();
+        Collection<T> valores = query.getResultList();
         return valores;
     }
 
@@ -671,9 +671,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         }
         DslFragment frag = buildHqlFragment("and", mapFilterField);
         sql.append(frag.sql);
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query query = getCurrentSession().createQuery(sql.toString(),Long.class);
         applyHqlParams(query, frag.params);
-        Long count = (Long) query.uniqueResult();
+        Long count = (Long)query.uniqueResult();
         return count;
     }
 
@@ -1391,6 +1391,14 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
             case "isnotnull":
                 f.sql.append(sh.append(v[1])).append(sh.append("is not null"));
                 break;
+            case "istrue":
+                f.sql.append(sh.append(v[1])).append(sh.append("=")).append(sh.append("?"));
+                f.params.add(true);
+                break;
+            case "isfalse":
+                f.sql.append(sh.append(v[1])).append(sh.append("=")).append(sh.append("?"));
+                f.params.add(false);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown DSL operator: " + v[0]);
         }
@@ -1461,6 +1469,14 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
                 break;
             case "isnotnull":
                 f.sql.append(sh.append(v[1])).append(sh.append("is not null"));
+                break;
+            case "istrue":
+                f.sql.append(sh.append(v[1])).append(sh.append("=")).append(sh.append(":dslP" + n));
+                f.params.add(true);
+                break;
+            case "isfalse":
+                f.sql.append(sh.append(v[1])).append(sh.append("=")).append(sh.append(":dslP" + n));
+                f.params.add(false);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown DSL operator: " + v[0]);

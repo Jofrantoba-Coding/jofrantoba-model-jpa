@@ -32,28 +32,28 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>        
-        <version.lombok>1.18.32</version.lombok>
+        <version.lombok>1.18.46</version.lombok>
         <version.slf4j-api>2.0.13</version.slf4j-api>
         <version.slf4j-simple>2.0.13</version.slf4j-simple>
         <version.log4j-api>2.21.1</version.log4j-api>
         <version.log4j-core>2.21.1</version.log4j-core>
-        <version.junit-platform-launcher>1.6.2</version.junit-platform-launcher>
-        <version.junit-jupiter-engine>5.6.2</version.junit-jupiter-engine>
-        <version.junit-vintage-engine>5.6.2</version.junit-vintage-engine>
-        <version.hamcrest-library>2.2</version.hamcrest-library>
-        <version.mockito-all>2.0.2-beta</version.mockito-all>         
+        <version.junit-platform-launcher>6.0.3</version.junit-platform-launcher>
+        <version.junit-jupiter-engine>6.0.3</version.junit-jupiter-engine>
+        <version.junit-vintage-engine>6.0.3</version.junit-vintage-engine>
+        <version.hamcrest>3.0</version.hamcrest>
+        <version.mockito-core>5.23.0</version.mockito-core>         
         <version.hibernate-core>6.5.2.Final</version.hibernate-core> 
         <version.hibernate-c3p0>6.5.2.Final</version.hibernate-c3p0>
         <version.ojdbc6>11.2.0.4</version.ojdbc6>        
-        <version.c3p0>0.9.5.5</version.c3p0>
+        <version.c3p0>0.12.0</version.c3p0>
         <version.com.google.guava>30.1.1-jre</version.com.google.guava>
         <version.commons-lang3>3.12.0</version.commons-lang3>
         <version.mysql-connector-java>8.0.28</version.mysql-connector-java>
-        <version.postgresql>42.6.0</version.postgresql>
+        <version.postgresql>42.7.2</version.postgresql>
         <version.jackson-databind>2.17.1</version.jackson-databind>   
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
-        <version.reflections>0.9.11</version.reflections>
-        <version.mssql-jdbc>12.8.1.jre11</version.mssql-jdbc>
+        <version.reflections>0.10.2</version.reflections>
+        <version.mssql-jdbc>12.8.2.jre11</version.mssql-jdbc>
         <version.maven-javadoc-plugin>3.8.0</version.maven-javadoc-plugin>
         <version.maven-gpg-plugin>3.2.4</version.maven-gpg-plugin>
         <version.central-publishing-maven-plugin>0.9.0</version.central-publishing-maven-plugin>
@@ -105,14 +105,14 @@
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>${version.hamcrest-library}</version>
+            <artifactId>hamcrest</artifactId>
+            <version>${version.hamcrest}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${version.mockito-all}</version>     
+            <artifactId>mockito-core</artifactId>
+            <version>${version.mockito-core}</version>     
             <scope>test</scope>
         </dependency>
         <dependency>

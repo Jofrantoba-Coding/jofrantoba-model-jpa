@@ -6,6 +6,7 @@
 package com.jofrantoba.model.jpa.daoentity.test;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,6 +32,8 @@ public abstract class GlobalEntityPkNumeric implements Serializable{
     private Long version;    
     @Column(name = "is_persistente")
     private Boolean isPersistente;
+    @Column(name = "marca_tiempo")
+    private LocalDateTime marcaTiempo;
     @Transient   
     private String operacion;
 }
