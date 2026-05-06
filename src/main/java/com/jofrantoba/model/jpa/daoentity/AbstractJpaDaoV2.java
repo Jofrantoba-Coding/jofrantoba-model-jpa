@@ -37,8 +37,9 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
+import java.sql.Types;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 
@@ -128,7 +129,7 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
            .append(clazz.getName()).append(sharedUtil.append("as base"));
         DslFragment frag = buildHqlFragment("and", mapFilterField);
         sql.append(frag.sql);
-        Query query = getCurrentSession().createQuery(sql.toString());
+        MutationQuery query = getCurrentSession().createMutationQuery(sql.toString());
         applyHqlParams(query, frag.params);
         return query.executeUpdate();
     }
@@ -396,35 +397,46 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
     }
 
     private void typesSet(ObjectNode node, ResultSet rs, ResultSetMetaData metadata, int i) throws SQLException {
-        if (metadata.getColumnTypeName(i).equals("numeric")) {
-            node.put(metadata.getColumnName(i), rs.getBigDecimal(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("text")) {
-            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("varchar")) {
-            node.put(metadata.getColumnName(i), rs.getString(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("serial")) {
-            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("int8") || metadata.getColumnTypeName(i).equals("int4")) {
-            node.put(metadata.getColumnName(i), rs.getLong(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("bool")) {
-            node.put(metadata.getColumnName(i), rs.getBoolean(metadata.getColumnName(i)));
-        }
-        if (metadata.getColumnTypeName(i).equals("date")) {
-            java.sql.Date fecha = rs.getDate(metadata.getColumnName(i));
-            if (fecha != null) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                String fechaStr = df.format(new java.util.Date(fecha.getTime()));
-                node.put(metadata.getColumnName(i) + "longtime", fecha.getTime());
-                node.put(metadata.getColumnName(i), fechaStr);
-            } else {
-                node.put(metadata.getColumnName(i) + "longtime", 0);
-                node.put(metadata.getColumnName(i), "");
-            }
+        String col = metadata.getColumnName(i);
+        switch (metadata.getColumnType(i)) {
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+                node.put(col, rs.getBigDecimal(col));
+                break;
+            case Types.VARCHAR:
+            case Types.CHAR:
+            case Types.LONGVARCHAR:
+            case Types.NVARCHAR:
+            case Types.NCHAR:
+            case Types.LONGNVARCHAR:
+                node.put(col, rs.getString(col));
+                break;
+            case Types.BIGINT:
+            case Types.INTEGER:
+            case Types.SMALLINT:
+            case Types.TINYINT:
+                node.put(col, rs.getLong(col));
+                break;
+            case Types.BOOLEAN:
+            case Types.BIT:
+                node.put(col, rs.getBoolean(col));
+                break;
+            case Types.DATE:
+                java.sql.Date fecha = rs.getDate(col);
+                if (fecha != null) {
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    String fechaStr = df.format(new java.util.Date(fecha.getTime()));
+                    node.put(col + "longtime", fecha.getTime());
+                    node.put(col, fechaStr);
+                } else {
+                    node.put(col + "longtime", 0);
+                    node.put(col, "");
+                }
+                break;
+            default:
+                String strVal = rs.getString(col);
+                if (strVal != null) node.put(col, strVal);
+                break;
         }
     }
 
@@ -561,9 +573,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (mapOrder != null) {
             sql.append(sharedUtil.append(orderString(mapOrder).toString()));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query<T> query = getCurrentSession().createQuery(sql.toString(), clazz);
         applyHqlParams(query, frag.params);
-        Collection<T> valores = query.list();
+        Collection<T> valores = query.getResultList();
         return valores;
     }
 
@@ -706,10 +718,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         }
         DslFragment frag = buildHqlFragment("and", mapFilterField);
         sql.append(frag.sql);
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query<Long> query = getCurrentSession().createQuery(sql.toString(), Long.class);
         applyHqlParams(query, frag.params);
-        Long count = (Long) query.uniqueResult();
-        return count;
+        return query.uniqueResult();
     }
 
     @Override
@@ -727,10 +738,9 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         if (groupBy != null) {
             sql.append(sharedUtil.append(groupBy));
         }
-        Query query = getCurrentSession().createQuery(sql.toString());
+        Query<Long> query = getCurrentSession().createQuery(sql.toString(), Long.class);
         applyHqlParams(query, frag.params);
-        Long count = (Long) query.uniqueResult();
-        return count;
+        return query.uniqueResult();
     }
 
     @Override
@@ -1183,7 +1193,7 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         builder.append(sharedUtil.append("("));
         StringBuilder fields = new StringBuilder();
         StringBuilder parameter = new StringBuilder();
-        HashMap<String, Object> queryParam = new HashMap();
+        HashMap<String, Object> queryParam = new HashMap<>();
         for (int i = 0; i < fieldValues.length; i++) {
             String fieldName = fieldValues[i].split(":")[0];
             validateIdentifier(fieldName);
@@ -1201,33 +1211,30 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
         builder.append(sharedUtil.append("("));
         builder.append(sharedUtil.append(parameter.toString()));
         builder.append(sharedUtil.append(")"));
-        NativeQuery query = this.getCurrentSession().createNativeQuery(builder.toString());
-        Iterator<String> iteradorKey = queryParam.keySet().iterator();
-        while (iteradorKey.hasNext()) {
-            String paramField = iteradorKey.next();
-            query.setParameter(paramField, queryParam.get(paramField));
+        MutationQuery query = this.getCurrentSession().createNativeMutationQuery(builder.toString());
+        for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
+            query.setParameter(entry.getKey(), entry.getValue());
         }
         int value = query.executeUpdate();
         return value;
     }
 
+    @Override
     public int iudNativeQuery(String sql) throws UnknownException {
-        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);
+        MutationQuery query = this.getCurrentSession().createNativeMutationQuery(sql);
         int value = query.executeUpdate();
         return value;
     }
 
     public int iudNativeQuery(String sql, String[] parametersValues) throws UnknownException {
         Shared sharedUtil = new Shared();
-        HashMap<String, Object> queryParam = new HashMap();
-        for (int i = 0; i < parametersValues.length; i++) {
-            queryParam.put(parametersValues[i].split(":")[0], sharedUtil.StringToObject(parametersValues[i].split(":")[1], parametersValues[i].split(":")[2]));
+        HashMap<String, Object> queryParam = new HashMap<>();
+        for (String pv : parametersValues) {
+            queryParam.put(pv.split(":")[0], sharedUtil.StringToObject(pv.split(":")[1], pv.split(":")[2]));
         }
-        NativeQuery query = this.getCurrentSession().createNativeQuery(sql);
-        Iterator<String> iteradorKey = queryParam.keySet().iterator();
-        while (iteradorKey.hasNext()) {
-            String paramField = iteradorKey.next();
-            query.setParameter(paramField, queryParam.get(paramField));
+        MutationQuery query = this.getCurrentSession().createNativeMutationQuery(sql);
+        for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
+            query.setParameter(entry.getKey(), entry.getValue());
         }
         int value = query.executeUpdate();
         return value;
@@ -1485,7 +1492,20 @@ public abstract class AbstractJpaDaoV2<T extends Serializable> implements InterC
 
     /** Binds collected HQL named parameters to a Hibernate Query. */
     @SuppressWarnings("unchecked")
-    private void applyHqlParams(Query query, List<Object> params) {
+    private void applyHqlParams(Query<?> query, List<Object> params) {
+        for (int i = 0; i < params.size(); i++) {
+            Object val = params.get(i);
+            if (val instanceof List) {
+                query.setParameterList("dslP" + i, (List<Object>) val);
+            } else {
+                query.setParameter("dslP" + i, val);
+            }
+        }
+    }
+
+    /** Overload for DML (MutationQuery) — same binding logic. */
+    @SuppressWarnings("unchecked")
+    private void applyHqlParams(MutationQuery query, List<Object> params) {
         for (int i = 0; i < params.size(); i++) {
             Object val = params.get(i);
             if (val instanceof List) {
