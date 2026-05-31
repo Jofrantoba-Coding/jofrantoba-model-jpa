@@ -7,6 +7,7 @@ package com.jofrantoba.model.jpa.daoentity.test.postgre;
 
 import com.jofrantoba.model.jpa.daoentity.test.TestAbstract;
 import com.jofrantoba.model.jpa.psf.PSF;
+import com.jofrantoba.model.jpa.psf.connection.ConnectionPool;
 import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesMysql;
 import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesPostgre;
 import java.sql.Connection;
@@ -43,7 +44,7 @@ public class TestAbstractJpaDaoPostgre extends TestAbstract {
     }
     
     private ConnectionPropertiesPostgre getCnx(){
-        ConnectionPropertiesPostgre cnx=new ConnectionPropertiesPostgre("localhost",5432,"icl","jofrantoba","J0fr4nt0b4");
+        ConnectionPropertiesPostgre cnx=new ConnectionPropertiesPostgre("localhost",5432,"icl","jofrantoba","J0fr4nt0b4",ConnectionPool.HIKARI);
         return cnx;
     }
     

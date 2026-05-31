@@ -25,5 +25,5 @@ public abstract class AbstractConnectionProperties implements ConnectionProperti
     private String urlConnection;
     private String driver;
     private String providerDatabase;   
-    
+    private ConnectionPool connectionPool = ConnectionPool.C3P0;
 }

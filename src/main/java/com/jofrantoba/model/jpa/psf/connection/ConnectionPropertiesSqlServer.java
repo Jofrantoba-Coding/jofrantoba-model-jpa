@@ -12,13 +12,23 @@ import org.hibernate.cfg.Environment;
  * @author apoyo1953
  */
 public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
-    
+
     public ConnectionPropertiesSqlServer(
             String host,
             int port,
             String nameDatabase,
             String userDatabase,
             String passwordDatabase){
+        this(host, port, nameDatabase, userDatabase, passwordDatabase, ConnectionPool.C3P0);
+    }
+
+    public ConnectionPropertiesSqlServer(
+            String host,
+            int port,
+            String nameDatabase,
+            String userDatabase,
+            String passwordDatabase,
+            ConnectionPool pool){
         super.setHost(host);
         super.setPort(port);
         super.setNameDatabase(nameDatabase);
@@ -27,7 +37,7 @@ public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
         super.setDriver(ProviderDatabase.SQLSERVER.getDriver());
         super.setProviderDatabase(ProviderDatabase.SQLSERVER.getNameProvider());
         super.setUrlConnection("jdbc:sqlserver://"+host+":"+port+";databasename="+nameDatabase+";encrypt=true;trustServerCertificate=true;");        
-        
+        super.setConnectionPool(pool);        
     }
     
     @Override
@@ -47,7 +57,7 @@ public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
         props.setProperty("hibernate.connection.charSet", "utf8mb4");
         props.setProperty("hibernate.connection.characterEncoding", "utf8");
         props.setProperty("hibernate.connection.isolation","2");
-        props.setProperty("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider");
+        /*props.setProperty("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider");
         props.setProperty("hibernate.c3p0.acquire_increment","5");
         props.setProperty("hibernate.c3p0.idle_test_period","3000");
         props.setProperty("hibernate.c3p0.min_size","5");
@@ -55,7 +65,8 @@ public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
         props.setProperty("hibernate.c3p0.max_statements","50");
         props.setProperty("hibernate.c3p0.timeout","1800");
         props.setProperty("hibernate.c3p0.acquireRetryAttempts","1");
-        props.setProperty("hibernate.c3p0.acquireRetryDelay","250");       
+        props.setProperty("hibernate.c3p0.acquireRetryDelay","250");*/       
+        super.getConnectionPool().apply(props);
         return props;
     }
     

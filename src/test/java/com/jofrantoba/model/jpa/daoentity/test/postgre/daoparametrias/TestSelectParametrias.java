@@ -7,6 +7,7 @@ package com.jofrantoba.model.jpa.daoentity.test.postgre.daoparametrias;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jofrantoba.model.jpa.daoentity.test.TestAbstract;
 import com.jofrantoba.model.jpa.psf.PSF;
+import com.jofrantoba.model.jpa.psf.connection.ConnectionPool;
 import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesPostgre;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -167,6 +168,6 @@ public class TestSelectParametrias extends TestAbstract {
     }
 
     private ConnectionPropertiesPostgre getCnx() {
-        return new ConnectionPropertiesPostgre("localhost", 5432, "icl", "jofrantoba", "J0fr4nt0b4");
+        return new ConnectionPropertiesPostgre("localhost", 5432, "icl", "jofrantoba", "J0fr4nt0b4",ConnectionPool.HIKARI);
     }
 }
