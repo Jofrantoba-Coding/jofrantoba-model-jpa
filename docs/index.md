@@ -21,7 +21,7 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 | Stored procedures | Input/output parameters, JSON-based calling convention |
 | Native SQL / HQL | Auto-transforms results to `ArrayNode` JSON |
 | Multi-database | One config class per DB engine - no code changes needed |
-| Connection pooling | C3P0, SessionFactory cached by key via `PSF` singleton |
+| Connection pooling | Selectable C3P0 (default) or HikariCP; SessionFactory cached by key via `PSF` singleton |
 | Logging | SLF4J + Log4j2 2.21.1 |
 | Zero config | Entity auto-discovery via `@Entity` + reflection |
 
@@ -70,13 +70,14 @@ mvn clean install -DskipTests
 | Jakarta Persistence | 3.2.0 |
 | Log4j | 2.21.1 |
 | SLF4J | 2.0.13 |
-| Lombok | 1.18.32 |
+| Lombok | 1.18.46 |
 | Jackson | 2.17.1 |
-| C3P0 pool | 0.9.5.5 |
+| C3P0 pool | 0.12.0 |
+| HikariCP (via `hibernate-hikaricp`) | 6.5.2.Final |
 | MySQL driver | 8.0.28 - MySQL 5.7+ |
-| PostgreSQL driver | 42.6.0 - PostgreSQL 8.4+ |
+| PostgreSQL driver | 42.7.2 - PostgreSQL 8.4+ |
 | Oracle JDBC | 11.2.0.4 - Oracle Database 11.2.0.4+ |
-| SQL Server JDBC | 12.8.1 - SQL Server 2016+ |
+| SQL Server JDBC | 12.8.2 - SQL Server 2016+ |
 
 ## License
 

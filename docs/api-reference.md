@@ -99,9 +99,9 @@ Use this path for high-volume grids, exports, dashboards, and multi-table projec
 
 ```java
 String[] joinTables = {
-    "inner:jofrantoba.catastro.tm_distrito as distrito:on:base.id_distrito:distrito.id",
-    "left:(select * from jofrantoba.catastro.tm_via where is_persistente=true) as via:on:base.id_via:via.id",
-    "left:jofrantoba.catastro.tgv_interior as interior:on:interior.id_numeracion:numeracion.id:and:interior.id_unidad_catastral:base.id"
+    "inner:jofrantoba.catalog.categories as category:on:base.category_id:category.id",
+    "left:(select * from jofrantoba.catalog.stock where active=true) as stock:on:base.id:stock.product_id",
+    "left:jofrantoba.catalog.brands as brand:on:brand.id:category.brand_id:and:brand.active:base.active"
 };
 ```
 
@@ -199,11 +199,18 @@ All extend `AbstractConnectionProperties` and implement `ConnectionProperties`.
 | `ConnectionPropertiesOracle` | Oracle Database 11.2.0.4+ | 1521 |
 | `ConnectionPropertiesSqlServer` | SQL Server 2016+ | 1433 |
 
-Constructor signature (all four):
+Constructor signatures (all four):
 ```java
+// Pool defaults to C3P0
 new ConnectionPropertiesXxx(String host, int port, String database,
                              String username, String password)
+
+// Explicit pool: ConnectionPool.C3P0 (default) or ConnectionPool.HIKARI
+new ConnectionPropertiesXxx(String host, int port, String database,
+                             String username, String password, ConnectionPool pool)
 ```
+
+See [Connection pool selection](configuration#connection-pool-selection) for the C3P0 and HikariCP defaults.
 
 ---
 

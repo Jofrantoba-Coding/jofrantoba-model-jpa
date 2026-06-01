@@ -185,14 +185,14 @@ Collection<Empleado> resultados = dao.customFieldsJoinFilterAnd(
 );
 ```
 
-**SQL Generado:**
+**HQL Generado** (los JOINs de entidad usan la asociación mapeada, sin `ON` explícito):
 ```sql
 SELECT 
   base.id as id,
   base.nombre as nombre,
   departamento.nombre as departamento
 FROM Empleado base
-LEFT JOIN departamento ON base.departamento_id = departamento.id
+LEFT JOIN base.departamento departamento
 WHERE 1=1
   AND base.activo = true
   AND departamento.id IS NOT NULL
@@ -322,7 +322,7 @@ String[] joinTables = {
 ```java
 "like:nombre:%Juan%"         // Contiene Juan
 "like:apellido:Garcia%"      // Comienza con Garcia
-"like:codigo:%ICL%"          // Contiene ICL
+"like:codigo:%ABC%"          // Contiene ABC
 ```
 
 ### 4. IN con Muchos Valores
@@ -371,4 +371,4 @@ String[] orden = {
 ## 🔗 Ver También
 
 - [README.md](README.md) - Documentación completa
-- [Documentación web](https://jofrantoba.github.io/jofrantoba-model-jpa/dsl-guide) - Guía DSL online con ejemplos adicionales
+- [Documentación web](https://jofrantoba-coding.github.io/jofrantoba-model-jpa/dsl-guide) - Guía DSL online con ejemplos adicionales

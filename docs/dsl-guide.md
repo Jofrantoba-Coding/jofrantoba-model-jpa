@@ -190,9 +190,9 @@ This avoids hydrating JPA entities and is intended for reports, dashboards, expo
 
 ```java
 String[] joinTables = {
-    "inner:jofrantoba.catastro.tm_distrito as distrito:on:base.id_distrito:distrito.id",
-    "inner:jofrantoba.catastro.tm_provincia as provincia:on:distrito.id_provincia:provincia.id",
-    "left:(select * from jofrantoba.catastro.tm_via where is_persistente=true) as via:on:base.id_via:via.id"
+    "inner:jofrantoba.catalog.categories as category:on:base.category_id:category.id",
+    "inner:jofrantoba.catalog.departments as department:on:category.department_id:department.id",
+    "left:(select * from jofrantoba.catalog.stock where active=true) as stock:on:base.id:stock.product_id"
 };
 ```
 
@@ -200,7 +200,7 @@ Multiple join conditions are expressed as additional colon-separated tokens:
 
 ```java
 String[] joinTables = {
-    "left:jofrantoba.catastro.tgv_interior as interior:on:interior.id_numeracion:numeracion.id:and:interior.id_unidad_catastral:base.id"
+    "left:jofrantoba.catalog.warehouse_stock as wstock:on:wstock.stock_id:stock.id:and:wstock.product_id:base.id"
 };
 ```
 

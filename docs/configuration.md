@@ -46,9 +46,9 @@ Compatibility is defined by the JDBC drivers bundled in `pom.xml`. The DAO layer
 | Database | Bundled driver | Minimum database version by driver | Notes |
 |----------|----------------|------------------------------------|-------|
 | MySQL | `mysql:mysql-connector-java:8.0.28` | MySQL 5.7 | Also supports MySQL 8.0. TLS 1.0/1.1 are not valid with this driver version. |
-| PostgreSQL | `org.postgresql:postgresql:42.6.0` | PostgreSQL 8.4 | pgJDBC regression coverage is stronger from PostgreSQL 9.1 onward. |
+| PostgreSQL | `org.postgresql:postgresql:42.7.2` | PostgreSQL 8.4 | pgJDBC regression coverage is stronger from PostgreSQL 9.1 onward. |
 | Oracle Database | `com.oracle.database.jdbc:ojdbc6:11.2.0.4` | Oracle Database 11.2.0.4 | Oracle's compatibility matrix also covers 12.1, 12.2, 18.3 and 19.x for this driver line. For modern Java runtimes, consider overriding to a newer `ojdbc8`, `ojdbc11` or `ojdbc17` driver in the consuming app. |
-| SQL Server | `com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11` | SQL Server 2016 | Also supports SQL Server 2017, 2019, 2022, Azure SQL Database, Azure SQL Managed Instance and Azure Synapse according to Microsoft's support matrix. |
+| SQL Server | `com.microsoft.sqlserver:mssql-jdbc:12.8.2.jre11` | SQL Server 2016 | Also supports SQL Server 2017, 2019, 2022, Azure SQL Database, Azure SQL Managed Instance and Azure Synapse according to Microsoft's support matrix. |
 
 These are driver-level minimums, not a guarantee that every custom native SQL string will run unchanged across all engines. Methods named `Postgres` return JSON through JDBC `ResultSet`, but their SQL syntax still needs to match the database where it is executed.
 
@@ -96,7 +96,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 );
 ```
 
-Driver version included: `postgresql:42.6.0`
+Driver version included: `postgresql:42.7.2`
 Minimum database version by driver: PostgreSQL 8.4
 
 ---
@@ -142,7 +142,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 );
 ```
 
-Driver version included: `mssql-jdbc:12.8.1.jre11`
+Driver version included: `mssql-jdbc:12.8.2.jre11`
 Minimum database version by driver: SQL Server 2016
 
 ---
@@ -241,17 +241,52 @@ public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao
 
 ---
 
-## C3P0 connection pool defaults
+## Connection pool selection
 
-All connection classes configure C3P0 with the following defaults:
+Every `ConnectionPropertiesXxx` class accepts an optional `ConnectionPool` enum that
+chooses the Hibernate connection provider. When omitted, the pool defaults to **C3P0**.
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `minPoolSize` | 5 | Minimum idle connections |
-| `maxPoolSize` | 20 | Maximum active connections |
-| `maxIdleTime` | 1800 s | Connection idle timeout |
-| `checkoutTimeout` | 30000 ms | Timeout waiting for a connection |
-| `idleConnectionTestPeriod` | 3600 s | Health-check interval |
+```java
+import com.jofrantoba.model.jpa.psf.connection.ConnectionPool;
+import com.jofrantoba.model.jpa.psf.connection.ConnectionPropertiesPostgre;
+
+// Default pool (C3P0)
+new ConnectionPropertiesPostgre("localhost", 5432, "myapp_db", "user", "pass");
+
+// Explicit pool selection
+new ConnectionPropertiesPostgre("localhost", 5432, "myapp_db", "user", "pass",
+        ConnectionPool.HIKARI);
+```
+
+The same six-argument overload is available on `ConnectionPropertiesMysql`,
+`ConnectionPropertiesOracle`, and `ConnectionPropertiesSqlServer`.
+
+### C3P0 defaults (`ConnectionPool.C3P0`)
+
+| Hibernate property | Default | Description |
+|--------------------|---------|-------------|
+| `hibernate.c3p0.min_size` | 5 | Minimum pooled connections |
+| `hibernate.c3p0.max_size` | 20 | Maximum pooled connections |
+| `hibernate.c3p0.acquire_increment` | 5 | Connections acquired when the pool is exhausted |
+| `hibernate.c3p0.max_statements` | 50 | Prepared-statement cache size |
+| `hibernate.c3p0.timeout` | 1800 s | Idle connection timeout |
+| `hibernate.c3p0.idle_test_period` | 3000 s | Health-check interval for idle connections |
+| `hibernate.c3p0.acquireRetryAttempts` | 1 | Acquisition retries before failing |
+| `hibernate.c3p0.acquireRetryDelay` | 250 ms | Delay between acquisition retries |
+
+Requires the `c3p0` and `hibernate-c3p0` dependencies (bundled).
+
+### HikariCP defaults (`ConnectionPool.HIKARI`)
+
+| Hibernate property | Default | Description |
+|--------------------|---------|-------------|
+| `hibernate.hikari.minimumIdle` | 5 | Minimum idle connections |
+| `hibernate.hikari.maximumPoolSize` | 20 | Maximum pool size |
+| `hibernate.hikari.idleTimeout` | 300000 ms (5 min) | Idle connection timeout |
+| `hibernate.hikari.connectionTimeout` | 30000 ms (30 s) | Timeout waiting for a connection |
+| `hibernate.hikari.maxLifetime` | 1800000 ms (30 min) | Maximum connection lifetime |
+
+Requires the `hibernate-hikaricp` dependency (bundled).
 
 ---
 
