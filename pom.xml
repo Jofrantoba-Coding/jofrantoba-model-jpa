@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <packaging>jar</packaging>
     <name>jofrantoba-model-jpa</name>
     <description>Generic JPA/Hibernate 6 DAO toolkit with CRUD operations, DSL filters, HQL joins, native SQL helpers, stored procedures, and JSON-style ResultSet mapping.</description>
@@ -58,6 +58,10 @@
         <version.maven-gpg-plugin>3.2.4</version.maven-gpg-plugin>
         <version.central-publishing-maven-plugin>0.9.0</version.central-publishing-maven-plugin>
         <version.hibernate-hikaricp>6.5.2.Final</version.hibernate-hikaricp>
+        <!-- GPG executable used by the 'release' profile. Defaults to the Git-for-Windows
+             bundled gpg.exe. Override on PATH-based environments (CI/Linux/macOS) with:
+             -Dgpg.executable=gpg -->
+        <gpg.executable>C:\Program Files\Git\usr\bin\gpg.exe</gpg.executable>
     </properties>
     <dependencies>                                                
         <dependency>
@@ -279,7 +283,7 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>${version.maven-gpg-plugin}</version>
                         <configuration>
-                            <executable>C:\Program Files\Git\usr\bin\gpg.exe</executable>
+                            <executable>${gpg.executable}</executable>
                         </configuration>
                         <executions>
                             <execution>
@@ -298,7 +302,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
-                            <autoPublish>false</autoPublish>
+                            <autoPublish>true</autoPublish>
                             <waitForPublishCompletion>true</waitForPublishCompletion>
                         </configuration>
                     </plugin>

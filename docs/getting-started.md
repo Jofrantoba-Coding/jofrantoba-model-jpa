@@ -29,7 +29,7 @@ nav_order: 2
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 

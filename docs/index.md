@@ -33,7 +33,7 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
