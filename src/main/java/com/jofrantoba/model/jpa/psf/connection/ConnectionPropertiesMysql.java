@@ -9,11 +9,29 @@ import java.util.Properties;
 import org.hibernate.cfg.Environment;
 
 /**
+ * Parámetros de conexión específicos para <strong>MySQL</strong> (8+).
+ * <p>
+ * Construye la URL JDBC con el formato
+ * {@code jdbc:mysql://host:puerto/baseDatos} y fija el driver y proveedor de
+ * {@link ProviderDatabase#MYSQL}. El método {@link #getProperties()} añade los
+ * ajustes de Hibernate (codificación UTF-8, nivel de aislamiento
+ * {@code READ_COMMITTED}, liberación de conexión tras la transacción) y aplica
+ * la estrategia de pool seleccionada.
  *
  * @author jona
  */
 public class ConnectionPropertiesMysql extends AbstractConnectionProperties{
 
+    /**
+     * Crea la configuración de conexión a MySQL usando el pool por defecto
+     * ({@link ConnectionPool#C3P0}).
+     *
+     * @param host             servidor de base de datos (host o IP)
+     * @param port             puerto del servidor MySQL (por defecto 3306)
+     * @param nameDatabase     nombre de la base de datos
+     * @param userDatabase     usuario de conexión
+     * @param passwordDatabase contraseña del usuario
+     */
     public ConnectionPropertiesMysql(
             String host,
             int port,
@@ -23,6 +41,17 @@ public class ConnectionPropertiesMysql extends AbstractConnectionProperties{
         this(host, port, nameDatabase, userDatabase, passwordDatabase, ConnectionPool.C3P0);
     }
 
+    /**
+     * Crea la configuración de conexión a MySQL indicando explícitamente la
+     * estrategia de pool de conexiones.
+     *
+     * @param host             servidor de base de datos (host o IP)
+     * @param port             puerto del servidor MySQL (por defecto 3306)
+     * @param nameDatabase     nombre de la base de datos
+     * @param userDatabase     usuario de conexión
+     * @param passwordDatabase contraseña del usuario
+     * @param pool             estrategia de pool de conexiones a utilizar
+     */
     public ConnectionPropertiesMysql(
             String host,
             int port,
@@ -41,9 +70,17 @@ public class ConnectionPropertiesMysql extends AbstractConnectionProperties{
         super.setConnectionPool(pool);
     }
     
+    /**
+     * Construye las propiedades de Hibernate para MySQL: driver, URL,
+     * credenciales, visualización de SQL, contexto de sesión por hilo,
+     * codificación UTF-8 y nivel de aislamiento {@code READ_COMMITTED} (2).
+     * Finalmente aplica la estrategia de pool configurada.
+     *
+     * @return las propiedades de conexión listas para Hibernate
+     */
     @Override
     public Properties getProperties() {
-        Properties props=new Properties();             
+        Properties props=new Properties();
         props.setProperty("jakarta.persistence.jdbc.driver", super.getDriver());
         props.setProperty("jakarta.persistence.jdbc.url", super.getUrlConnection());
         props.setProperty("jakarta.persistence.jdbc.user", super.getUserDatabase());        

@@ -8,11 +8,29 @@ import java.util.Properties;
 import org.hibernate.cfg.Environment;
 
 /**
+ * Parámetros de conexión específicos para <strong>Microsoft SQL Server</strong>.
+ * <p>
+ * Construye la URL JDBC con el formato
+ * {@code jdbc:sqlserver://host:puerto;databasename=base;encrypt=true;trustServerCertificate=true;}
+ * y fija el driver y proveedor de {@link ProviderDatabase#SQLSERVER}. El método
+ * {@link #getProperties()} añade los ajustes de Hibernate (codificación UTF-8,
+ * nivel de aislamiento {@code READ_COMMITTED}, manejo de conexión diferido por
+ * transacción) y aplica la estrategia de pool seleccionada.
  *
  * @author apoyo1953
  */
 public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
 
+    /**
+     * Crea la configuración de conexión a SQL Server usando el pool por
+     * defecto ({@link ConnectionPool#C3P0}).
+     *
+     * @param host             servidor de base de datos (host o IP)
+     * @param port             puerto del servidor SQL Server (por defecto 1433)
+     * @param nameDatabase     nombre de la base de datos
+     * @param userDatabase     usuario de conexión
+     * @param passwordDatabase contraseña del usuario
+     */
     public ConnectionPropertiesSqlServer(
             String host,
             int port,
@@ -22,6 +40,17 @@ public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
         this(host, port, nameDatabase, userDatabase, passwordDatabase, ConnectionPool.C3P0);
     }
 
+    /**
+     * Crea la configuración de conexión a SQL Server indicando explícitamente
+     * la estrategia de pool de conexiones.
+     *
+     * @param host             servidor de base de datos (host o IP)
+     * @param port             puerto del servidor SQL Server (por defecto 1433)
+     * @param nameDatabase     nombre de la base de datos
+     * @param userDatabase     usuario de conexión
+     * @param passwordDatabase contraseña del usuario
+     * @param pool             estrategia de pool de conexiones a utilizar
+     */
     public ConnectionPropertiesSqlServer(
             String host,
             int port,
@@ -40,9 +69,17 @@ public class ConnectionPropertiesSqlServer extends AbstractConnectionProperties{
         super.setConnectionPool(pool);        
     }
     
+    /**
+     * Construye las propiedades de Hibernate para SQL Server: driver, URL,
+     * credenciales, visualización de SQL, contexto de sesión por hilo,
+     * codificación UTF-8 y nivel de aislamiento {@code READ_COMMITTED} (2).
+     * Finalmente aplica la estrategia de pool configurada.
+     *
+     * @return las propiedades de conexión listas para Hibernate
+     */
     @Override
     public Properties getProperties() {
-        Properties props=new Properties();      
+        Properties props=new Properties();
         props.setProperty("jakarta.persistence.jdbc.driver", super.getDriver());
         props.setProperty("jakarta.persistence.jdbc.url", super.getUrlConnection());
         props.setProperty("jakarta.persistence.jdbc.user", super.getUserDatabase());        

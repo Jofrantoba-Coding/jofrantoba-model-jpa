@@ -44,22 +44,70 @@ import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 
 /**
+ * Implementación genérica de {@link InterCrud} basada en JPA/Hibernate&nbsp;6.
+ * <p>
+ * Concentra toda la lógica de acceso a datos reutilizable: operaciones CRUD
+ * básicas, consultas con la API Criteria de JPA, consultas HQL con filtros,
+ * <em>joins</em> y paginación dinámicos, SQL nativo (en especial para
+ * PostgreSQL, con resultados mapeados a JSON mediante Jackson), procedimientos
+ * almacenados y exportación de resultados. Las clases DAO concretas solo
+ * necesitan extender esta clase, fijar el tipo de entidad con
+ * {@link #setClazz(Class)} en su constructor e inyectar un
+ * {@link SessionFactory} con {@link #setSessionFactory(SessionFactory)}.
+ *
+ * <h2>DSL de filtros, ordenamiento y joins</h2>
+ * Esta clase interpreta las cadenas del DSL descrito en {@link InterCrud}
+ * ({@code "operador:campo:valor"}, {@code "campo:direccion"}, etc.).
+ *
+ * <h2>Seguridad frente a inyección SQL</h2>
+ * Los valores del DSL nunca se concatenan en la sentencia: se enlazan como
+ * parámetros con nombre (HQL) o posicionales (SQL nativo). Los nombres de
+ * campo, tablas, conectores lógicos y tipos de join se validan contra listas
+ * blancas y expresiones regulares de identificadores seguros
+ * ({@link #validateIdentifier(String)}, {@link #validateTableRef(String)},
+ * {@link #validateConnector(String)}); cualquier valor sospechoso provoca una
+ * {@link IllegalArgumentException}.
+ *
+ * <h2>Gestión de sesión</h2>
+ * Las operaciones usan {@link #getCurrentSession()}, que delega en la sesión
+ * vinculada al hilo ({@code thread}); la gestión transaccional queda a cargo
+ * del código que invoca al DAO.
+ * <p>
+ * Gracias a Lombok ({@link lombok.Data @Data}) se generan los accesores de
+ * {@code clazz} y {@code sessionFactory}.
  *
  * @author jona
- * @param <T>
+ * @param <T> tipo de la entidad gestionada por este DAO; debe ser {@link Serializable}
+ * @see InterCrud
  */
 @Log4j2
 @Data
 public abstract class AbstractJpaDao<T extends Serializable> implements InterCrud<T> {
 
+    /** Tipo de la entidad gestionada; se usa para crear consultas tipadas. */
     private Class<T> clazz;
 
+    /** Fábrica de sesiones de Hibernate desde la que se obtiene la sesión del hilo. */
     private SessionFactory sessionFactory;
 
+    /**
+     * Inyecta la {@link SessionFactory} que este DAO usará para obtener sesiones.
+     *
+     * @param sessionFactory la fábrica de sesiones de Hibernate
+     */
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
+    /**
+     * Fija el tipo de entidad gestionado por el DAO.
+     * <p>
+     * Las subclases deben invocarlo (normalmente en su constructor) para que las
+     * consultas tipadas y los mapeos funcionen correctamente.
+     *
+     * @param clazzToSet clase de la entidad; no puede ser {@code null}
+     * @throws NullPointerException si {@code clazzToSet} es {@code null}
+     */
     protected void setClazz(final Class<T> clazzToSet) {
         clazz = Preconditions.checkNotNull(clazzToSet);
     }
@@ -198,6 +246,20 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return sql;
     }
 
+    /**
+     * Añade a la sentencia SQL nativa las cláusulas {@code JOIN ... ON ...}
+     * descritas en {@code joinTables}.
+     * <p>
+     * Cada definición tiene el formato {@code "tipo:tabla:on:colIzq:colDer"} y,
+     * para condiciones compuestas, pares adicionales de columnas separados por
+     * conectores ({@code and}/{@code or}). El tipo de join, la referencia a la
+     * tabla y los identificadores de columna se validan para impedir inyección.
+     *
+     * @param joinTables definiciones de join en formato DSL de SQL nativo
+     * @param sql        acumulador de la sentencia SQL al que se añaden los joins
+     * @throws IllegalArgumentException si el tipo de join, la tabla, una columna
+     *         o un conector no son válidos
+     */
     private void joins(String[] joinTables, StringBuilder sql) {
         Shared sharedUtil = new Shared();
         for (String joinTable : joinTables) {
@@ -396,6 +458,22 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return array;
     }
 
+    /**
+     * Vuelca el valor de la columna {@code i} del {@link ResultSet} en el nodo
+     * JSON, eligiendo el tipo JSON adecuado según el tipo SQL de la columna.
+     * <p>
+     * Los numéricos exactos se mapean a {@link java.math.BigDecimal}, los
+     * enteros a {@code long}, los textos a {@code String}, los booleanos a
+     * {@code boolean} y las fechas a una cadena {@code yyyy-MM-dd} acompañada de
+     * una propiedad adicional {@code <columna>longtime} con el tiempo en
+     * milisegundos. Cualquier otro tipo se serializa como texto.
+     *
+     * @param node     nodo JSON destino donde se añade la propiedad
+     * @param rs       {@link ResultSet} posicionado en la fila actual
+     * @param metadata metadatos del {@code ResultSet} para conocer nombre y tipo de columna
+     * @param i        índice (1-based) de la columna a volcar
+     * @throws SQLException si ocurre un error al leer del {@code ResultSet}
+     */
     private void typesSet(ObjectNode node, ResultSet rs, ResultSetMetaData metadata, int i) throws SQLException {
         String col = metadata.getColumnName(i);
         switch (metadata.getColumnType(i)) {
@@ -944,6 +1022,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return collection;
     }
 
+    /**
+     * Convierte un arreglo de filtros DSL en un arreglo de {@link Predicate} de
+     * Criteria, traduciendo cada cadena con {@link #filterString}.
+     *
+     * @param build          el {@link CriteriaBuilder} en uso
+     * @param criteria       la consulta Criteria en construcción
+     * @param root           la raíz de la entidad
+     * @param mapFilterField filtros en formato DSL
+     * @return los predicados equivalentes, en el mismo orden
+     */
     private Predicate[] stringToPredicate(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root,
             String[] mapFilterField) {
         Predicate[] filters = new Predicate[mapFilterField.length];
@@ -958,6 +1046,18 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     // These are NOT used in any query-executing path.
     // -------------------------------------------------------------------------
 
+    /**
+     * Construye una cláusula {@code WHERE} textual (no parametrizada) uniendo
+     * los filtros con el conector indicado.
+     * <p>
+     * <strong>Heredado:</strong> solo lo usan los métodos {@code str*} de
+     * depuración que devuelven el SQL como texto; no interviene en ninguna ruta
+     * que ejecute consultas. Si no hay filtros genera {@code where 1=2}.
+     *
+     * @param conectorLogicoDefault conector lógico entre filtros ({@code "and"}/{@code "or"})
+     * @param mapFilterField        filtros en formato DSL
+     * @return la cláusula {@code WHERE} como {@link StringBuilder}
+     */
     private StringBuilder buildFilterStringSelect(String conectorLogicoDefault, String[] mapFilterField) {
         StringBuilder filter = new StringBuilder();
         Shared sharedUtil = new Shared();
@@ -973,6 +1073,15 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return filter;
     }
 
+    /**
+     * Aplica a una consulta Criteria el ordenamiento descrito en un mapa
+     * campo→dirección.
+     *
+     * @param build    el {@link CriteriaBuilder} en uso
+     * @param criteria la consulta Criteria a la que aplicar el orden
+     * @param mapOrder mapa de campo a dirección ({@code "asc"}/{@code "desc"});
+     *                 si es {@code null} o vacío no se aplica orden
+     */
     private void orderMap(CriteriaBuilder build, CriteriaQuery<T> criteria, HashMap<String, String> mapOrder) {
         if (mapOrder != null && mapOrder.size() > 0) {
             Root<T> c = criteria.from(clazz);
@@ -991,6 +1100,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
     }
 
+    /**
+     * Aplica a una consulta Criteria el ordenamiento descrito como cláusulas
+     * {@code "campo:direccion"}.
+     *
+     * @param build    el {@link CriteriaBuilder} en uso
+     * @param criteria la consulta Criteria a la que aplicar el orden
+     * @param root     la raíz de la entidad sobre la que resolver los campos
+     * @param mapOrder ordenamientos en formato {@code "campo:direccion"};
+     *                 si es {@code null} o vacío no se aplica orden
+     */
     private void orderString(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root, String... mapOrder) {
         if (mapOrder != null && mapOrder.length > 0) {
             List<Order> orders = new ArrayList();
@@ -1007,6 +1126,17 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         }
     }
 
+    /**
+     * Construye una cláusula {@code ORDER BY} textual para HQL/SQL a partir de
+     * cláusulas {@code "campo:direccion"}.
+     * <p>
+     * Valida cada nombre de campo como identificador seguro y exige que la
+     * dirección sea {@code asc} o {@code desc}.
+     *
+     * @param mapOrder ordenamientos en formato {@code "campo:direccion"}
+     * @return la cláusula {@code ORDER BY} como {@link StringBuilder}
+     * @throws IllegalArgumentException si un campo no es válido o la dirección no es {@code asc}/{@code desc}
+     */
     private StringBuilder orderString(String... mapOrder) {
         StringBuilder order = new StringBuilder();
         Shared sharedUtil = new Shared();
@@ -1030,6 +1160,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return order;
     }
 
+    /**
+     * Traduce un único filtro DSL a su fragmento SQL textual (no parametrizado).
+     * <p>
+     * <strong>Heredado:</strong> solo lo usa {@link #buildFilterStringSelect}
+     * para los métodos {@code str*} de depuración; no se emplea en consultas
+     * reales (que sí parametrizan los valores).
+     *
+     * @param mapFilterField filtro en formato DSL ({@code "operador:campo:valor"})
+     * @return el fragmento SQL del filtro como {@link StringBuilder}
+     */
     private StringBuilder filterStringSelect(String mapFilterField) {
         StringBuilder pre = new StringBuilder();
         Shared sharedUtil = new Shared();
@@ -1080,6 +1220,14 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return pre;
     }
 
+    /**
+     * Une con comas los elementos del arreglo a partir del índice {@code init},
+     * para construir la lista de valores de una cláusula {@code IN (...)} textual.
+     *
+     * @param init                  índice inicial desde el que concatenar
+     * @param mapFilterFieldsValues arreglo de valores (los primeros posiciones son operador/campo)
+     * @return los valores separados por comas
+     */
     private String valuesByComas(int init, String[] mapFilterFieldsValues) {
         String valuesIn = "";
         int valueControl = mapFilterFieldsValues.length - 1;
@@ -1089,6 +1237,21 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return valuesIn;
     }
 
+    /**
+     * Traduce un único filtro DSL a un {@link Predicate} de la API Criteria.
+     * <p>
+     * Soporta los operadores {@code >}, {@code <}, {@code >=}, {@code <=},
+     * {@code =}, {@code like}, {@code between}, {@code in}, {@code isnull},
+     * {@code isnotnull}, {@code istrue}, {@code isfalse} y {@code equal}. Los
+     * comparadores numéricos interpretan el valor como {@code double}, mientras
+     * que {@code equal} y {@code like} lo tratan como texto.
+     *
+     * @param build          el {@link CriteriaBuilder} en uso
+     * @param criteria       la consulta Criteria en construcción
+     * @param root           la raíz de la entidad sobre la que resolver el campo
+     * @param mapFilterField filtro en formato DSL ({@code "operador:campo:valor"})
+     * @return el {@link Predicate} equivalente, o {@code null} si el operador no se reconoce
+     */
     private Predicate filterString(CriteriaBuilder build, CriteriaQuery<T> criteria, Root<T> root,
             String mapFilterField) {
         Predicate pre = null;
@@ -1179,6 +1342,14 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return data;
     }
 
+    /**
+     * Devuelve la {@link Session} de Hibernate vinculada al hilo actual.
+     * <p>
+     * Es el punto único de acceso a la sesión que utilizan internamente todas
+     * las operaciones de este DAO.
+     *
+     * @return la sesión actual obtenida de la {@link SessionFactory}
+     */
     protected Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
     }
@@ -1226,6 +1397,22 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return value;
     }
 
+    /**
+     * Ejecuta una sentencia DML en SQL nativo con parámetros con nombre.
+     * <p>
+     * Cada elemento de {@code parametersValues} tiene el formato
+     * {@code "nombre:valor:tipo"}, donde {@code tipo} es uno de los soportados
+     * por {@link Shared#StringToObject(String, String)}. Los valores se enlazan
+     * como parámetros con nombre, evitando la concatenación directa en el SQL.
+     * <p>
+     * Sobrecarga de {@link #iudNativeQuery(String)} que no forma parte de
+     * {@link InterCrud}.
+     *
+     * @param sql              sentencia SQL nativa con parámetros con nombre ({@code :nombre})
+     * @param parametersValues descriptores de parámetro en formato {@code "nombre:valor:tipo"}
+     * @return número de filas afectadas
+     * @throws UnknownException si ocurre un error de acceso a datos
+     */
     public int iudNativeQuery(String sql, String[] parametersValues) throws UnknownException {
         Shared sharedUtil = new Shared();
         HashMap<String, Object> queryParam = new HashMap<>();
@@ -1297,12 +1484,26 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     private static final java.util.regex.Pattern SAFE_IDENTIFIER =
         java.util.regex.Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$");
 
+    /**
+     * Valida que el identificador (columna o campo, eventualmente cualificado
+     * con punto) sea seguro para interpolarse en SQL/HQL.
+     *
+     * @param id identificador a validar
+     * @throws IllegalArgumentException si es {@code null} o contiene caracteres no permitidos
+     */
     private static void validateIdentifier(String id) {
         if (id == null || !SAFE_IDENTIFIER.matcher(id.trim()).matches()) {
             throw new IllegalArgumentException("Unsafe SQL identifier: " + id);
         }
     }
 
+    /**
+     * Valida que el conector lógico sea {@code "and"} u {@code "or"}
+     * (sin distinguir mayúsculas).
+     *
+     * @param connector conector lógico a validar
+     * @throws IllegalArgumentException si no es {@code "and"} ni {@code "or"}
+     */
     private static void validateConnector(String connector) {
         if (connector == null || (!connector.equalsIgnoreCase("and") && !connector.equalsIgnoreCase("or"))) {
             throw new IllegalArgumentException("Invalid SQL connector: " + connector);
@@ -1320,6 +1521,15 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
             "(\\s+(?:[aA][sS]\\s+)?[a-zA-Z_][a-zA-Z0-9_]*)?$"
         );
 
+    /**
+     * Valida que la referencia a tabla sea segura: nombre (opcionalmente
+     * cualificado con esquema) con un alias opcional ({@code tabla alias} o
+     * {@code tabla as alias}). Las subconsultas que empiezan por {@code "("},
+     * generadas por código interno de confianza, se aceptan sin validar.
+     *
+     * @param ref referencia a tabla a validar
+     * @throws IllegalArgumentException si es {@code null} o no cumple el patrón seguro
+     */
     private static void validateTableRef(String ref) {
         if (ref == null) throw new IllegalArgumentException("Null table reference");
         if (ref.trim().startsWith("(")) return; // subquery from trusted internal code
@@ -1352,6 +1562,16 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return result;
     }
 
+    /**
+     * Añade al fragmento un único filtro DSL traducido a SQL nativo, generando
+     * marcadores posicionales {@code ?} y registrando sus valores enlazados.
+     * Valida el nombre de campo antes de usarlo.
+     *
+     * @param expr filtro en formato DSL ({@code "operador:campo:valor"})
+     * @param f    fragmento acumulador de SQL y parámetros
+     * @param sh   utilidad de concatenación con espacios
+     * @throws IllegalArgumentException si el operador es desconocido o el campo no es válido
+     */
     private void appendNativeFilter(String expr, DslFragment f, Shared sh) {
         String[] v = expr.split(":");
         validateIdentifier(v[1]);
@@ -1432,6 +1652,17 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
         return result;
     }
 
+    /**
+     * Añade al fragmento un único filtro DSL traducido a HQL, generando
+     * parámetros con nombre {@code :dslPN} (numerados de forma correlativa) y
+     * registrando sus valores enlazados. Valida el nombre de campo antes de
+     * usarlo.
+     *
+     * @param expr filtro en formato DSL ({@code "operador:campo:valor"})
+     * @param f    fragmento acumulador de HQL y parámetros
+     * @param sh   utilidad de concatenación con espacios
+     * @throws IllegalArgumentException si el operador es desconocido o el campo no es válido
+     */
     private void appendHqlFilter(String expr, DslFragment f, Shared sh) {
         String[] v = expr.split(":");
         validateIdentifier(v[1]);
