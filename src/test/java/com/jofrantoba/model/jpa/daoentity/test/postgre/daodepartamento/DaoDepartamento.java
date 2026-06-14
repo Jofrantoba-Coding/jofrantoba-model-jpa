@@ -5,7 +5,7 @@
  */
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daodepartamento;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author jona
  */
-public class DaoDepartamento extends AbstractJpaDaoV2<Departamento>
+public class DaoDepartamento extends AbstractJpaDao<Departamento>
         implements InterDaoDepartamento {
 
     public DaoDepartamento() {

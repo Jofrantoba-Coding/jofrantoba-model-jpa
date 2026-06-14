@@ -5,7 +5,7 @@
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daoprovincia;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.Shared;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author jona
  */
-public class DaoProvincia extends AbstractJpaDaoV2<Provincia>
+public class DaoProvincia extends AbstractJpaDao<Provincia>
         implements InterDaoProvincia {
 
     public DaoProvincia() {

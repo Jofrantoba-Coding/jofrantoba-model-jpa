@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.Shared;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author jofrantoba
  */
-public class DaoMenu extends AbstractJpaDaoV2<Menu>
+public class DaoMenu extends AbstractJpaDao<Menu>
         implements InterDaoMenu {
 
     public DaoMenu() {

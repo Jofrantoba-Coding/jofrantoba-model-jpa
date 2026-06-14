@@ -4,7 +4,7 @@
  */
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daosistema;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author jofrantoba
  */
-public class DaoSistema extends AbstractJpaDaoV2<Sistema>
+public class DaoSistema extends AbstractJpaDao<Sistema>
         implements InterDaoSistema {
 
     public DaoSistema() {

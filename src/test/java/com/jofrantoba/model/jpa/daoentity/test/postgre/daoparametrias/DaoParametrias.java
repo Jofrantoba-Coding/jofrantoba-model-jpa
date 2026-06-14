@@ -6,7 +6,7 @@
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daoparametrias;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author jona
  */
-public class DaoParametrias extends AbstractJpaDaoV2<Parametrias>
+public class DaoParametrias extends AbstractJpaDao<Parametrias>
         implements InterDaoParametrias {
 
     public DaoParametrias() {

@@ -5,7 +5,7 @@
  */
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daocliente;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author jona
  */
-public class DaoCliente extends AbstractJpaDaoV2<Cliente>
+public class DaoCliente extends AbstractJpaDao<Cliente>
         implements InterDaoCliente {
 
     public DaoCliente() {

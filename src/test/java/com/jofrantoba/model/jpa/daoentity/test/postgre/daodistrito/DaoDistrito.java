@@ -5,7 +5,7 @@
 package com.jofrantoba.model.jpa.daoentity.test.postgre.daodistrito;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.shared.Shared;
 import com.jofrantoba.model.jpa.shared.UnknownException;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author jofrantoba
  */
-public class DaoDistrito extends AbstractJpaDaoV2<Distrito>
+public class DaoDistrito extends AbstractJpaDao<Distrito>
         implements InterDaoDistrito {
 
     public DaoDistrito() {
