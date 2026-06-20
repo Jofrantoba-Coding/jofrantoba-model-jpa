@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <packaging>jar</packaging>
     <name>jofrantoba-model-jpa</name>
     <description>Generic JPA/Hibernate 6 DAO toolkit with CRUD operations, DSL filters, HQL joins, native SQL helpers, stored procedures, and JSON-style ResultSet mapping.</description>
