@@ -125,7 +125,7 @@ public abstract class AbstractJpaDao<T extends Serializable> implements InterCru
     @Override
     public void save(final T entity) {
         Preconditions.checkNotNull(entity);
-        getCurrentSession().merge(entity);
+        getCurrentSession().persist(entity);
     }
 
     @Override
