@@ -180,7 +180,7 @@ The artifact becomes available on Maven Central within 15–30 minutes.
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.4</version>
 </dependency>
 ```
 

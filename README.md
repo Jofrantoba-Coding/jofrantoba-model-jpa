@@ -1,6 +1,6 @@
 # jofrantoba-model-jpa
 
-Generic DAO toolkit for **JPA / Hibernate 6** applications. It provides a reusable repository base class, `AbstractJpaDaoV2<T>`, with CRUD operations, a string-based DSL for dynamic filters, HQL/entity joins, native relational joins, pagination, grouping, stored procedures, and JSON-style native query results.
+Generic DAO toolkit for **JPA / Hibernate 6** applications. It provides a reusable repository base class, `AbstractJpaDao<T>`, with CRUD operations, a string-based DSL for dynamic filters, HQL/entity joins, native relational joins, pagination, grouping, stored procedures, and JSON-style native query results.
 
 **Requirements:** Java 17+ | Maven 3.8+ | Hibernate 6.5+ | Jakarta Persistence 3.2+
 
@@ -27,21 +27,21 @@ Most enterprise persistence layers repeat the same patterns:
 - Stored procedure calls.
 - Export-style SQL queries.
 
-`AbstractJpaDaoV2<T>` centralizes those patterns so each repository only declares its entity type and its domain-specific methods.
+`AbstractJpaDao<T>` centralizes those patterns so each repository only declares its entity type and its domain-specific methods.
 
 ## Core Concepts
 
 ### Repository Shape
 
 ```java
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.daoentity.InterCrud;
 
 public interface InterDaoProduct extends InterCrud<Product> {
     Collection<Product> activeProducts() throws Exception;
 }
 
-public class DaoProduct extends AbstractJpaDaoV2<Product> implements InterDaoProduct {
+public class DaoProduct extends AbstractJpaDao<Product> implements InterDaoProduct {
 
     public DaoProduct() {
         setClazz(Product.class);
@@ -59,10 +59,10 @@ public class DaoProduct extends AbstractJpaDaoV2<Product> implements InterDaoPro
 
 ### Entity `T` And The `base` Alias
 
-In HQL/entity methods, `T` is the root entity and `base` is the alias created by `AbstractJpaDaoV2`.
+In HQL/entity methods, `T` is the root entity and `base` is the alias created by `AbstractJpaDao`.
 
 ```java
-public class DaoProduct extends AbstractJpaDaoV2<Product> {
+public class DaoProduct extends AbstractJpaDao<Product> {
     public DaoProduct() {
         setClazz(Product.class);
     }
@@ -150,7 +150,7 @@ Collection<Product> rows = dao.customFieldsJoinFilterAnd(
 ## Native Relational Joins
 
 Use native joins when you need table-level SQL and `ArrayNode` results.
-These methods bypass Hibernate entity hydration for the result rows: `AbstractJpaDaoV2` executes the SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps each row directly to Jackson `ObjectNode` / `ArrayNode`.
+These methods bypass Hibernate entity hydration for the result rows: `AbstractJpaDao` executes the SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps each row directly to Jackson `ObjectNode` / `ArrayNode`.
 
 That is useful for high-volume reports, grids, exports, dashboards, and multi-table projections where creating managed JPA entities would add unnecessary overhead.
 
@@ -220,7 +220,7 @@ For the full repository pattern, see [Repository Examples](https://jofrantoba-co
 
 ## SQL Safety Contract
 
-`AbstractJpaDaoV2` parameterizes:
+`AbstractJpaDao` parameterizes:
 
 - DSL filter values.
 - HQL named parameters.
@@ -277,8 +277,8 @@ Bundled driver compatibility:
 
 | Database | Driver | Minimum database version by driver |
 |----------|--------|------------------------------------|
-| MySQL | `mysql-connector-java:8.0.28` | MySQL 5.7 |
-| PostgreSQL | `postgresql:42.7.2` | PostgreSQL 8.4 |
+| MySQL | `com.mysql:mysql-connector-j:9.7.0` | MySQL 8.0 |
+| PostgreSQL | `postgresql:42.7.11` | PostgreSQL 8.4 |
 | Oracle Database | `ojdbc6:11.2.0.4` | Oracle Database 11.2.0.4 |
 | SQL Server | `mssql-jdbc:12.8.2.jre11` | SQL Server 2016 |
 
@@ -290,7 +290,7 @@ See [Database Configuration](https://jofrantoba-coding.github.io/jofrantoba-mode
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.4</version>
 </dependency>
 ```
 

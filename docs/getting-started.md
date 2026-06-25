@@ -29,7 +29,7 @@ nav_order: 2
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.4</version>
 </dependency>
 ```
 
@@ -98,16 +98,16 @@ public interface IProductDao extends InterCrud<Product> {
 }
 ```
 
-**Implementation** — extends `AbstractJpaDaoV2<T>`:
+**Implementation** — extends `AbstractJpaDao<T>`:
 
 ```java
 package com.example.myapp.dao;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.example.myapp.entity.Product;
 import java.util.Collection;
 
-public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
 
     public ProductDao() {
         setClazz(Product.class);

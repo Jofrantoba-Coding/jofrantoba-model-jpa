@@ -84,9 +84,13 @@ public interface InterCrud<T extends Serializable> {
     T findById(final String id)throws UnknownException;
 
     /**
-     * Persiste la entidad (alta o actualización) mediante {@code merge}.
+     * Da de alta una entidad nueva mediante {@code persist}.
      * <p>
-     * Si la entidad no existe se inserta; si existe, se sincronizan sus cambios.
+     * La entidad debe estar en estado <em>transient</em> (sin identidad
+     * persistente todavía); tras la llamada queda gestionada por el contexto de
+     * persistencia y se programará su {@code INSERT}. Para sincronizar los
+     * cambios de una entidad ya existente o <em>detached</em>, utilice
+     * {@link #update(Serializable)}.
      *
      * @param entity entidad a guardar; no puede ser {@code null}
      * @throws UnknownException si ocurre un error de acceso a datos

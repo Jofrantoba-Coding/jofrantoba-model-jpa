@@ -45,8 +45,8 @@ Compatibility is defined by the JDBC drivers bundled in `pom.xml`. The DAO layer
 
 | Database | Bundled driver | Minimum database version by driver | Notes |
 |----------|----------------|------------------------------------|-------|
-| MySQL | `mysql:mysql-connector-java:8.0.28` | MySQL 5.7 | Also supports MySQL 8.0. TLS 1.0/1.1 are not valid with this driver version. |
-| PostgreSQL | `org.postgresql:postgresql:42.7.2` | PostgreSQL 8.4 | pgJDBC regression coverage is stronger from PostgreSQL 9.1 onward. |
+| MySQL | `com.mysql:mysql-connector-j:9.7.0` | MySQL 8.0 | Driver line 9.x supports MySQL 8.0+ and Java 21. TLS 1.0/1.1 are not valid with this driver version. |
+| PostgreSQL | `org.postgresql:postgresql:42.7.11` | PostgreSQL 8.4 | pgJDBC regression coverage is stronger from PostgreSQL 9.1 onward. |
 | Oracle Database | `com.oracle.database.jdbc:ojdbc6:11.2.0.4` | Oracle Database 11.2.0.4 | Oracle's compatibility matrix also covers 12.1, 12.2, 18.3 and 19.x for this driver line. For modern Java runtimes, consider overriding to a newer `ojdbc8`, `ojdbc11` or `ojdbc17` driver in the consuming app. |
 | SQL Server | `com.microsoft.sqlserver:mssql-jdbc:12.8.2.jre11` | SQL Server 2016 | Also supports SQL Server 2017, 2019, 2022, Azure SQL Database, Azure SQL Managed Instance and Azure Synapse according to Microsoft's support matrix. |
 
@@ -72,8 +72,8 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 );
 ```
 
-Driver version included: `mysql-connector-java:8.0.28`
-Minimum database version by driver: MySQL 5.7
+Driver version included: `com.mysql:mysql-connector-j:9.7.0`
+Minimum database version by driver: MySQL 8.0
 Character set: `utf8mb4`
 
 ---
@@ -96,7 +96,7 @@ SessionFactory sf = PSF.getInstance().buildPSF(
 );
 ```
 
-Driver version included: `postgresql:42.7.2`
+Driver version included: `postgresql:42.7.11`
 Minimum database version by driver: PostgreSQL 8.4
 
 ---
@@ -212,14 +212,14 @@ public class DaoConfig {
 **DAO auto-wired with Spring:**
 
 ```java
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import jakarta.annotation.PostConstruct;
 
 @Repository
-public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
 
     @Autowired(required = false)
     @Qualifier("sessionFactory")

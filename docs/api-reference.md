@@ -15,15 +15,15 @@ nav_order: 5
 
 ---
 
-## AbstractJpaDaoV2\<T\>
+## AbstractJpaDao\<T\>
 
-`com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2<T extends Serializable>`
+`com.jofrantoba.model.jpa.daoentity.AbstractJpaDao<T extends Serializable>`
 
 Generic base class for all DAOs. Extend it and call `setClazz(YourEntity.class)` in the constructor.
-`AbstractJpaDaoV2` is the preferred implementation for new code because DSL filter values are bound as parameters and native join metadata is validated.
+`AbstractJpaDao` is the preferred implementation for new code because DSL filter values are bound as parameters and native join metadata is validated.
 
 ```java
-public class ProductDao extends AbstractJpaDaoV2<Product> {
+public class ProductDao extends AbstractJpaDao<Product> {
     public ProductDao() { setClazz(Product.class); }
 }
 ```
@@ -82,7 +82,7 @@ All methods below accept DSL string arrays. See the [DSL Guide](dsl-guide) for s
 
 ### PostgreSQL / relational methods (returns `ArrayNode`)
 
-These methods are optimized for reporting-style reads. They do not hydrate managed Hibernate entities for each row. `AbstractJpaDaoV2` executes the native SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps the row values directly into Jackson `ObjectNode` instances collected in an `ArrayNode`.
+These methods are optimized for reporting-style reads. They do not hydrate managed Hibernate entities for each row. `AbstractJpaDao` executes the native SQL through JDBC `PreparedStatement`, reads the `ResultSet`, and maps the row values directly into Jackson `ObjectNode` instances collected in an `ArrayNode`.
 
 Use this path for high-volume grids, exports, dashboards, and multi-table projections where JSON output is the desired result and entity lifecycle management is unnecessary.
 
@@ -194,7 +194,7 @@ All extend `AbstractConnectionProperties` and implement `ConnectionProperties`.
 
 | Class | Database | Default port |
 |-------|----------|-------------|
-| `ConnectionPropertiesMysql` | MySQL 5.7+ | 3306 |
+| `ConnectionPropertiesMysql` | MySQL 8.0+ | 3306 |
 | `ConnectionPropertiesPostgre` | PostgreSQL 8.4+ | 5432 |
 | `ConnectionPropertiesOracle` | Oracle Database 11.2.0.4+ | 1521 |
 | `ConnectionPropertiesSqlServer` | SQL Server 2016+ | 1433 |

@@ -62,7 +62,7 @@ public class Employee implements Serializable {
 ```java
 package com.example.hr.dao;
 
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.daoentity.InterCrud;
 import com.example.hr.entity.Employee;
 import java.util.Collection;
@@ -72,7 +72,7 @@ public interface IEmployeeDao extends InterCrud<Employee> {
     Collection<Employee> findActive(int page, int size) throws Exception;
 }
 
-public class EmployeeDao extends AbstractJpaDaoV2<Employee> implements IEmployeeDao {
+public class EmployeeDao extends AbstractJpaDao<Employee> implements IEmployeeDao {
 
     public EmployeeDao() { setClazz(Employee.class); }
 
@@ -227,7 +227,7 @@ public interface ICategoryDao extends InterCrud<Category> {
     ArrayNode listPaged(Long limit, Long offset) throws Exception;
 }
 
-public class CategoryDao extends AbstractJpaDaoV2<Category> implements ICategoryDao {
+public class CategoryDao extends AbstractJpaDao<Category> implements ICategoryDao {
 
     public CategoryDao() { setClazz(Category.class); }
 
@@ -435,7 +435,7 @@ public class DaoConfig {
 
 // ProductDao.java
 @Repository
-public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
 
     @Autowired @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;

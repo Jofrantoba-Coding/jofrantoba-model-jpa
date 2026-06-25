@@ -15,14 +15,14 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 
 | Feature | Details |
 |---------|---------|
-| Generic DAO | `AbstractJpaDaoV2<T>` works for any JPA entity and parameterizes DSL filter values |
+| Generic DAO | `AbstractJpaDao<T>` works for any JPA entity and parameterizes DSL filter values |
 | CRUD | save, update, delete, findById - numeric and string PKs |
 | Dynamic queries | DSL filters, JOINs, GROUP BY, ORDER BY, pagination |
 | Stored procedures | Input/output parameters, JSON-based calling convention |
 | Native SQL / HQL | Auto-transforms results to `ArrayNode` JSON |
 | Multi-database | One config class per DB engine - no code changes needed |
 | Connection pooling | Selectable C3P0 (default) or HikariCP; SessionFactory cached by key via `PSF` singleton |
-| Logging | SLF4J + Log4j2 2.21.1 |
+| Logging | SLF4J + Log4j2 2.26.0 |
 | Zero config | Entity auto-discovery via `@Entity` + reflection |
 
 ---
@@ -33,7 +33,7 @@ Generic ORM framework built on **JPA / Hibernate 6** with multi-database support
 <dependency>
     <groupId>com.jofrantoba.model.jpa</groupId>
     <artifactId>jofrantoba-model-jpa</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.4</version>
 </dependency>
 ```
 
@@ -56,7 +56,7 @@ mvn clean install -DskipTests
 | [DSL Guide](dsl-guide) | Complete reference for the declarative query DSL |
 | [API Reference](api-reference) | All classes and methods |
 | [Examples](examples) | Full working patterns for real-world scenarios |
-| [Method Examples](method-examples) | Minimal usage example for each `AbstractJpaDaoV2` public method |
+| [Method Examples](method-examples) | Minimal usage example for each `AbstractJpaDao` public method |
 | [Repository Examples](repository-examples) | Sanitized examples generated from every Java file in `.examples` |
 
 ---
@@ -68,14 +68,16 @@ mvn clean install -DskipTests
 | Java (compiler target) | 21 (supports 17+) |
 | Hibernate ORM | 6.5.2.Final |
 | Jakarta Persistence | 3.2.0 |
-| Log4j | 2.21.1 |
+| Log4j | 2.26.0 |
 | SLF4J | 2.0.13 |
 | Lombok | 1.18.46 |
 | Jackson | 2.17.1 |
+| Guava | 33.6.0-jre |
+| Apache Commons Lang | 3.20.0 |
 | C3P0 pool | 0.12.0 |
 | HikariCP (via `hibernate-hikaricp`) | 6.5.2.Final |
-| MySQL driver | 8.0.28 - MySQL 5.7+ |
-| PostgreSQL driver | 42.7.2 - PostgreSQL 8.4+ |
+| MySQL driver | 9.7.0 - MySQL 8.0+ |
+| PostgreSQL driver | 42.7.11 - PostgreSQL 8.4+ |
 | Oracle JDBC | 11.2.0.4 - Oracle Database 11.2.0.4+ |
 | SQL Server JDBC | 12.8.2 - SQL Server 2016+ |
 

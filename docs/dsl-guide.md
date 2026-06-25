@@ -43,11 +43,11 @@ Collection<Product> results = dao.customFieldsFilterAnd(fields, filters, order);
 
 ## Entity `T` and the `base` alias
 
-`AbstractJpaDaoV2<T>` always treats `T` as the root entity for HQL/entity methods.
+`AbstractJpaDao<T>` always treats `T` as the root entity for HQL/entity methods.
 In those methods, the DAO builds queries using `base` as the alias for `T`.
 
 ```java
-public class ProductDao extends AbstractJpaDaoV2<Product> {
+public class ProductDao extends AbstractJpaDao<Product> {
     public ProductDao() {
         setClazz(Product.class);
     }
@@ -212,7 +212,7 @@ Subqueries are allowed only for trusted internal SQL.
 
 ## SQL safety contract
 
-`AbstractJpaDaoV2` parameterizes DSL filter values, `limit`, and `offset`.
+`AbstractJpaDao` parameterizes DSL filter values, `limit`, and `offset`.
 It also validates filter/order identifiers, native join types, table references, and join condition identifiers.
 
 ### What is safe to accept from user input

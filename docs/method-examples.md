@@ -6,7 +6,7 @@ nav_order: 7
 # Method Examples
 {: .no_toc }
 
-This page shows one minimal usage example for each public method exposed by `AbstractJpaDaoV2`.
+This page shows one minimal usage example for each public method exposed by `AbstractJpaDao`.
 The snippets use neutral schemas such as `jofrantoba.sales` and `jofrantoba.catalog`; replace them with constants from your own application.
 
 <details open markdown="block">
@@ -22,7 +22,7 @@ The snippets use neutral schemas such as `jofrantoba.sales` and `jofrantoba.cata
 
 ```java
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.model.jpa.daoentity.InterCrud;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import org.hibernate.transform.Transformers;
 public interface IProductDao extends InterCrud<Product> {
 }
 
-public class ProductDao extends AbstractJpaDaoV2<Product> implements IProductDao {
+public class ProductDao extends AbstractJpaDao<Product> implements IProductDao {
     public ProductDao(SessionFactory sessionFactory) {
         setClazz(Product.class);
         setSessionFactory(sessionFactory);
@@ -65,7 +65,7 @@ String[] nameOrder = {"base.name:asc"};
 
 ### Entity `T` and `base`
 
-`ProductDao extends AbstractJpaDaoV2<Product>` means `Product` is the root entity `T`.
+`ProductDao extends AbstractJpaDao<Product>` means `Product` is the root entity `T`.
 For HQL/entity methods, `base` is the alias of that entity:
 
 ```java

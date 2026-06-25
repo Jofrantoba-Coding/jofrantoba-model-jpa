@@ -8,7 +8,7 @@ nav_order: 8
 
 This guide explains the complex repository patterns used by the `.examples` projects, sanitized to neutral `jofrantoba.*` schemas and `com.jofrantoba.examples.*` packages.
 
-It does not copy every file line by line. Instead, it teaches how the examples are structured and how repository classes use `AbstractJpaDaoV2` through the DSL for joins, subqueries, grouping, pagination, DTO projections, counts, and trusted SQL builders.
+It does not copy every file line by line. Instead, it teaches how the examples are structured and how repository classes use `AbstractJpaDao` through the DSL for joins, subqueries, grouping, pagination, DTO projections, counts, and trusted SQL builders.
 
 <details open markdown="block">
   <summary>Contents</summary>
@@ -24,15 +24,15 @@ It does not copy every file line by line. Instead, it teaches how the examples a
 Every complex example follows the same structure:
 
 1. A DAO interface extends `InterCrud<T>` and declares domain-specific methods.
-2. A repository class extends `AbstractJpaDaoV2<T>`.
+2. A repository class extends `AbstractJpaDao<T>`.
 3. The constructor calls `setClazz(Entity.class)`.
 4. Public repository methods build DSL arrays: `fields`, `table`, `joinTables`, `mapFilterField`, `mapOrder`, `groupBy`.
-5. The repository delegates execution to inherited `AbstractJpaDaoV2` methods.
+5. The repository delegates execution to inherited `AbstractJpaDao` methods.
 
-`T` is the entity managed by the repository. For HQL/entity methods, `AbstractJpaDaoV2` uses `base` as the alias of that entity:
+`T` is the entity managed by the repository. For HQL/entity methods, `AbstractJpaDao` uses `base` as the alias of that entity:
 
 ```java
-public class DaoProduct extends AbstractJpaDaoV2<Product> {
+public class DaoProduct extends AbstractJpaDao<Product> {
     public DaoProduct() {
         setClazz(Product.class);
     }
@@ -57,14 +57,14 @@ All native `fields`, `joinTables`, `mapFilterField`, `mapOrder`, and `groupBy` e
 package com.jofrantoba.examples.catalog.dao.impl;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jofrantoba.model.jpa.daoentity.AbstractJpaDaoV2;
+import com.jofrantoba.model.jpa.daoentity.AbstractJpaDao;
 import com.jofrantoba.examples.catalog.dao.inter.InterDaoProduct;
 import com.jofrantoba.examples.catalog.entity.Product;
 import com.jofrantoba.examples.catalog.filter.FilterProduct;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class DaoProduct extends AbstractJpaDaoV2<Product> implements InterDaoProduct {
+public class DaoProduct extends AbstractJpaDao<Product> implements InterDaoProduct {
 
     public DaoProduct() {
         setClazz(Product.class);
@@ -111,7 +111,7 @@ public interface InterDaoProduct extends InterCrud<Product> {
 
 ### Filter DSL
 
-`mapFilterField` values are parsed by `AbstractJpaDaoV2` and bound as query parameters.
+`mapFilterField` values are parsed by `AbstractJpaDao` and bound as query parameters.
 
 ```java
 String[] mapFilterField = {
@@ -151,7 +151,7 @@ This maps to entity paths such as `base.category category`.
 Use native joins for table-based methods that return `ArrayNode`.
 These joins do not use JPA entity relationships; they use SQL table references and the explicit alias from `table`, usually `base`.
 
-The native methods are intentionally optimized for JSON results. Hibernate is used to obtain the current connection, but the query is executed with JDBC `PreparedStatement`; `AbstractJpaDaoV2` reads the `ResultSet` and writes each row directly to Jackson JSON nodes.
+The native methods are intentionally optimized for JSON results. Hibernate is used to obtain the current connection, but the query is executed with JDBC `PreparedStatement`; `AbstractJpaDao` reads the `ResultSet` and writes each row directly to Jackson JSON nodes.
 
 Use this when a repository method is a read-only report/query endpoint and does not need managed JPA entities.
 
@@ -197,7 +197,7 @@ public interface InterDaoActivity extends InterCrud<Activity> {
 ### Repository
 
 ```java
-public class DaoActivity extends AbstractJpaDaoV2<Activity> implements InterDaoActivity {
+public class DaoActivity extends AbstractJpaDao<Activity> implements InterDaoActivity {
 
     public DaoActivity() {
         setClazz(Activity.class);
@@ -587,7 +587,7 @@ public Map<Integer, Object[]> exportActiveProducts() throws Exception {
 
 ## Security Rules Preserved From The Examples
 
-- Values in `mapFilterField` are parameterized by `AbstractJpaDaoV2`.
+- Values in `mapFilterField` are parameterized by `AbstractJpaDao`.
 - `limit` and `offset` are bound as JDBC parameters.
 - Native `ArrayNode` methods use JDBC `PreparedStatement` + `ResultSet` and skip Hibernate entity hydration.
 - Native join types and join identifiers are validated.
